@@ -1,9 +1,10 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express");
+const app = express();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+const routes = {};
 
-module.exports = router;
+// Importing mpesa routes
+const mpesa = require('../routes/mpesa.routes');
+routes.mpesa = mpesa
+
+module.exports = routes;
