@@ -15,7 +15,7 @@ module.exports = {
 	partyA: "party-sending-funds", //should follow the format:2547xxxxxxxx
 	partyB: mpesaConfig.shortcode,
 	phoneNumber: "party-sending-funds", //should follow the format:2547xxxxxxxx
-	callBackUrl: "https://805a-2c0f-fe38-2326-d804-138a-e2a7-eb22-45a0.ngrok-free.app/mpesa/callback",
+	callBackUrl: "https://6898-2c0f-fe38-2326-d804-fb6b-2d36-805a-c306.ngrok-free.app/mpesa/callback",
 	accountReference: "lipa-na-mpesa-tutorial",
 	transaction_desc: "Testing lipa na mpesa functionality"
 };
