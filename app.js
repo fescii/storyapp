@@ -9,6 +9,13 @@ let corsOptions = {
   origin: "http://localhost:${process.env.PORT}"
 };
 
+const db = require("./models");
+const Role = db.Role;
+
+//SyncDb
+// noinspection JSIgnoredPromiseFromCall
+syncDb()
+
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
@@ -25,8 +32,8 @@ app.get("/", (req, res) => {
 });
 
 // routes
-// routes.mpesa(app)
-require('./routes/mpesa.routes')(app);
+routes.mpesa(app)
+
 
 // set port, listen for requests
 const PORT = process.env.PORT || 300;
@@ -34,3 +41,60 @@ app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 
+//Creating Initial Roles
+function initial() {
+  Role.create({
+    id: 1,
+    name: "user"
+  }).then(r => {
+    console.log('role-created successfully!')
+  });
+  
+  Role.create({
+    id: 2,
+    name: "moderator"
+  }).then(r => {
+    console.log('role-created successfully!')
+  });
+  
+  Role.create({
+    id: 3,
+    name: "admin"
+  }).then(r => {
+    console.log('role-created successfully!')
+  });
+}
+
+//Checks and Create Role Data Preventing Duplication
+async function syncDb(alter){
+  try {
+    const roles = await Role.findAll()
+    
+    if (roles.length === 0){
+      console.log('Syncing Fresh Db...');
+      db.sequelize.sync().then(() => {
+        initial();
+      });
+    }
+    else{
+      if (alter){
+        console.log('Altering Db Changes...');
+        db.sequelize.sync({alter: true}).then(() => {
+          console.log('All Changes Synced!');
+        });
+      }
+      else {
+        console.log('Syncing Db Changes...');
+        db.sequelize.sync().then(() => {
+          console.log('All Changes Synced!');
+        });
+      }
+      
+    }
+  } catch (e) {
+    console.log("Database isn't created, Creating & Syncing Db...");
+    db.sequelize.sync().then(() => {
+      initial();
+    });
+  }
+}

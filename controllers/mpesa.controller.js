@@ -3,61 +3,60 @@ const axios = require('axios').default;
 require('dotenv').config();
 const { mpesaData } = require('../middleware')
 const { mpesaConfig } = require('../config')
+const middlewares = require('../middleware')
+
+const Time = middlewares.Time
+
+const db = require('../models')
+
+const Transaction = db.Transaction
 
 
-getAuthToken = async (req, res, next) => {
-	console.log('inside')
-	//form a buffer of the consumer key and secret
-	const buffer = new Buffer.from(mpesaConfig.consumer_key + ":" + mpesaConfig.consumer_secret);
+getAccessToken = (req, res, next) => {
+	const headers = {
+		"Authorization": "Basic cFJZcjZ6anEwaThMMXp6d1FETUxwWkIzeVBDa2hNc2M6UmYyMkJmWm9nMHFRR2xWOQ=="
+	};
 	
-	const auth = `Basic ${buffer.toString('base64')}`;
-	
-	try {
-		
-		const {data} = await axios.get(mpesaConfig.url, {
-			"headers": {
-				"Authorization": auth
-			}
+	axios
+		.get(mpesaConfig.auth_url, { headers: headers })
+		.then(response => {
+			const data = response.data;
+			console.log(data)
+			req.token = data["access_token"];
+			next();
+		})
+		.catch(err => {
+			const errorMessage = err.response ? err.response.statusText : 'An error occurred';
+			res.status(500).json({
+				success: false,
+				message: errorMessage
+			});
 		});
-		
-		req.token = data['access_token'];
-		
-		return next();
-		
-	}
-	catch (err) {
-		
-		return res.send({
-			success: false,
-			message: err['response']['statusText']
-		});
-		
-	}
-}
+};
 
 lipaNaMpesa = async (req, res) => {
 	let token = req.token;
 	let auth = `Bearer ${token}`;
 	
-	console.log(auth)
 	
 	let amount = "1"; //you can enter any amount
 	let partyA = "254713253018"; //should follow the format:2547xxxxxxxx
 	let phoneNumber = "254713253018"; //should follow the format:2547xxxxxxxx
 	
+	// console.log(`${mpesaData.callBackUrl}/${partyA}`)
 	try {
 		
 		const {data} = await axios.post(mpesaConfig.url, {
 			"BusinessShortCode": mpesaData.bs_short_code,
 			"Password": mpesaData.password,
-			"Timestamp": mpesaData.password,
+			"Timestamp": mpesaData.timestamp,
 			"TransactionType": mpesaData.transaction_type,
 			"Amount": amount,
 			"PartyA": partyA,
 			"PartyB": mpesaData.partyB,
 			"PhoneNumber": phoneNumber,
-			"CallBackURL": mpesaData.callBackUrl,
-			"AccountReference": mpesaData.callBackUrl,
+			"CallBackURL": `${mpesaData.callBackUrl}/${partyA}`,
+			"AccountReference": mpesaData.accountReference,
 			"TransactionDesc": mpesaData.transaction_desc
 		}, {
 			"headers": {
@@ -70,32 +69,143 @@ lipaNaMpesa = async (req, res) => {
 			message: data
 		});
 		
-	} catch (err) {
-		
+	}
+	catch (err) {
+		const errorMessage = err.response ? err.response.statusText : 'An error occurred';
 		return res.send({
 			success: false,
-			message: err['response']['statusText']
+			message: errorMessage
 		});
-		
 	}
 };
 
-lipaNaMpesaCallback = (req, res) => {
-	
+lipaNaMpesaCallback = async (req, res) => {
 	//Get the transaction description
-	let message = req.body.Body.stkCallback['ResultDesc'];
-	
-	return res.send({
-		success:true,
-		message
-	});
+	try {
+		// Parse the callback data sent by M-Pesa
+		const {orderId} = req.params
+		const callbackData = req.body;
+		
+		console.log(orderId)
+		switch (callbackData["Body"]["stkCallback"]["ResultCode"]) {
+			case 0:
+				const callbackMetadata = callbackData["Body"]["stkCallback"]["CallbackMetadata"];
+				const items = callbackMetadata.Item;
+				
+				// Initialize variables to store values
+				let amount,
+				mpesaReceiptNumber,
+				phoneNumber,
+				TransactionDate;
+				
+				
+				// Iterate through items to find specific values
+				for (const item of items) {
+					switch (item.Name) {
+						case "Amount":
+							amount = item.Value;
+							break;
+						case "MpesaReceiptNumber":
+							mpesaReceiptNumber = item.Value;
+							break
+						case "TransactionDate":
+							console.log(item.Value)
+							TransactionDate = Time.localTime(item.Value);
+							break;
+						case "PhoneNumber":
+							phoneNumber = item.Value;
+							break;
+					}
+				}
+				
+				console.log("Amount:", amount);
+				console.log("MpesaReceiptNumber:", mpesaReceiptNumber);
+				console.log("PhoneNumber:", phoneNumber);
+				
+				Transaction.create({
+						checkout_id: callbackData["Body"]["stkCallback"]["CheckoutRequestID"],
+						date: TransactionDate,
+						phone: phoneNumber,
+						receipt: mpesaReceiptNumber,
+						amount:  amount
+					})
+					.then(transaction => {
+						console.log(
+							`Transaction created successfully!\n,
+							Transaction: ${transaction}`
+							)
+					})
+					.catch(err => {
+						console.log(err.message)
+					});
+				
+				break;
+			default:
+				console.log("ResultCode is not 0. Data not available.");
+				break;
+		}
+		
+		// Send a response to acknowledge receipt of the callback
+		return res.send({
+			success: true,
+			message: 'Callback received and processed successfully'
+		});
+		// res.status(200).json({ message: 'Callback received and processed successfully' });
+	} catch (error) {
+		console.error('Callback processing error:', error);
+		
+		// Handle errors and send an appropriate response
+		res.status(500).json({error: 'Internal server error'});
+	}
 	
 };
 
+confirmPayment = async(req, res) => {
+	try {
+		const url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query";
+		
+		let token = req.token;
+		let auth = `Bearer ${token}`;
+		
+		const timestamp = mpesaData.timestamp;
+		// shortcode + passkey + timestamp
+		const password = mpesaData.password
+		
+		const requestData = {
+			BusinessShortCode:mpesaData.bs_short_code,
+			Password: password,
+			Timestamp: timestamp,
+			CheckoutRequestID: req.params.CheckoutRequestID,
+		};
+		
+		
+		const {data} = await axios.post(url,  requestData, {
+			"headers": {
+				"Authorization": auth
+			}
+		}).catch(console.log);
+		
+		console.log(data)
+		return res.send({
+			success: true,
+			message: data
+		});
+		
+	} catch (error) {
+		console.error("Error while trying to confirm payment:", error);
+		res.status(503).send({
+			success: false,
+			message: "Something went wrong while trying to confirm payment. Contact admin",
+			error: error,
+		});
+	}
+}
+
 const Mpesa = {
-	getAuthToken: authtoken,
+	getAccessToken: getAccessToken,
 	lipaNaMpesa: lipaNaMpesa,
-	lipaNaMpesaCallback: lipaNaMpesaCallback
+	lipaNaMpesaCallback: lipaNaMpesaCallback,
+	confirmPayment: confirmPayment
 };
 
 module.exports = Mpesa;

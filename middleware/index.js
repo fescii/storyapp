@@ -3,9 +3,10 @@
 const middlewares = {};
 
 // Importing
-const timestamp = require('../middleware/timestamp.middleware');
+const Time  = require('./time.middleware');
 const mpesaData = require('../middleware/data.middleware')
-middlewares.timestamp = timestamp
+
+middlewares.Time = Time
 middlewares.mpesaData = mpesaData
 
 module.exports = middlewares;

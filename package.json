@@ -27,6 +27,10 @@
     "express": "^4.18.2",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "ngrok": "^5.0.0-beta.2"
+    "ngrok": "^5.0.0-beta.2",
+    "sequelize": "^6.33.0",
+    "pg": "^8.10.0",
+    "pg-hstore": "^2.3.4",
+    "postgres": "^3.3.4"
   }
 }
