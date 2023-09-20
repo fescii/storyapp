@@ -1,20 +1,20 @@
-const config = require("../config/db.config.js");
+const { dbConfig } = require('../config')
 
 const Sequelize = require("sequelize");
 let sequelize = new Sequelize(
-	config.DB,
-	config.USER,
-	config.PASSWORD,
+	dbConfig.DB,
+	dbConfig.USER,
+	dbConfig.PASSWORD,
 	{
-		host: config.HOST,
-		dialect: config.dialect,
+		host: dbConfig.HOST,
+		dialect: dbConfig.dialect,
 		operatorsAliases: 0,
 		
 		pool: {
-			max: config.pool.max,
-			min: config.pool.min,
-			acquire: config.pool.acquire,
-			idle: config.pool.idle
+			max: dbConfig.pool.max,
+			min: dbConfig.pool.min,
+			acquire: dbConfig.pool.acquire,
+			idle: dbConfig.pool.idle
 		}
 	}
 );
@@ -30,8 +30,8 @@ const {User, Role} = require('../models/user.model')(sequelize, Sequelize);
 Object.assign(db, {User, Role})
 
 // Importing From Post Model
-const {Transaction} = require('./transaction.model')(sequelize, Sequelize);
-Object.assign(db, { Transaction })
+const {Transaction, Booking} = require('./booking.model')(sequelize, Sequelize);
+Object.assign(db, { Transaction, Booking })
 
 
 // Adding Role Range
