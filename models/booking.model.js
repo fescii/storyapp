@@ -45,7 +45,7 @@ module.exports = (sequelize, Sequelize) => {
 		},
 		status: {
 			type: Sequelize.ENUM('started', 'completed', 'not-started'),
-			defaultValue: 'completed',
+			defaultValue: 'not-started',
 			allowNull: false,
 		},
 	}	, {

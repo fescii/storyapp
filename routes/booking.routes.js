@@ -13,6 +13,9 @@ module.exports = function(app) {
 	//Make order
 	app.post('/booking/order/make', bookingController.makeOrder);
 	
+	//Check order
+	app.get('/booking/order/status', bookingController.checkStatus);
+	
 	//Get order files
 	app.get('/booking/order/check', bookingMiddleware.checkBalance, bookingController.viewFiles);
 };

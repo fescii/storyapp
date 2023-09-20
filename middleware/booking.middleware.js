@@ -28,43 +28,54 @@ checkBalance =  (req, res, next) => {
 			include: Transaction
 		})
 		.then(booking => {
-			if (booking){
-				const price = booking.price
-				// console.log(booking.transactions)
-				if (booking.transactions.length > 0){
+			if (!booking){
+				return res.status(200).send({
+					success: false,
+					status: 'not-found',
+					message: "Booking not Found!, Check your number or Email"
+				});
+			}
+			switch (booking.status) {
+				case 'not-started':
+					return res.status(200).send({
+						success: false,
+						status: 'not-started',
+						message: "The work is not yet started, We'll be notified via phone/email."
+					});
+				case 'started':
+					return res.status(200).send({
+						success: false,
+						status: 'started',
+						message: "The work is started but not completed, We'll be notified via phone/email."
+					});
+				case 'completed':
+					const price = booking.price
+					if (!booking.transactions.length > 0){
+						return res.status(200).send({
+							success: false,
+							status: 'completed',
+							balance: price,
+							message: "No payments made!, Please pay to view files"
+						});
+					}
 					const transactions = arrayUtil.mapFields(booking.transactions, 'amount')
 					const paidAmount = arrayUtil.sumArray(transactions)
-					// console.log(transactions)
-					// console.log(paidAmount)
 					
 					if ( paidAmount >= price ){
 						next();
+						return;
 					}
 					else	{
 						const balance = price - paidAmount
-						// console.log(balance)
-						res.status(200).send({
-							success: true,
+						return res.status(200).send({
+							success: false,
+							status: 'completed',
 							balance: balance,
 							message: "Complete your payment to access the files"
 						});
 					}
-				}
-				else {
-					res.status(200).send({
-						success: false,
-						balance: price,
-						message: "No payments made!, Please pay to view files"
-					});
-				}
+				
 			}
-			else	{
-				res.status(200).send({
-					success: false,
-					message: "Booking not Found!, Check your number or Email"
-				});
-			}
-			
 			
 		})
 		.catch(err => {
