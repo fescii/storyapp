@@ -35,8 +35,7 @@ app.get("/", (req, res) => {
 routes.mpesa(app)
 routes.auth(app)
 routes.user(app)
-
-
+routes.booking(app)
 
 // set port, listen for requests
 const PORT = process.env.PORT || 300;

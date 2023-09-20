@@ -16,7 +16,7 @@ module.exports = function(app) {
 	app.post('/mpesa/lipa', Mpesa.getAccessToken, Mpesa.lipaNaMpesa);
 	
 	//callback url
-	app.post('/mpesa/callback/:orderId', Mpesa.lipaNaMpesaCallback);
+	app.post('/mpesa/callback/:orderId/:bookId', Mpesa.lipaNaMpesaCallback);
 	
 	//callback url
 	app.post('/mpesa/confirm/:CheckoutRequestID', Mpesa.getAccessToken, Mpesa.confirmPayment);

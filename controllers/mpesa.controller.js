@@ -52,7 +52,7 @@ lipaNaMpesa = async (req, res) => {
 			"PartyA": partyA,
 			"PartyB": mpesaData.partyB,
 			"PhoneNumber": phoneNumber,
-			"CallBackURL": `${mpesaData.callBackUrl}/${partyA}`,
+			"CallBackURL": `${mpesaData.callBackUrl}/${partyA}/2`,
 			"AccountReference": mpesaData.accountReference,
 			"TransactionDesc": mpesaData.transaction_desc
 		}, {
@@ -80,7 +80,9 @@ lipaNaMpesaCallback = async (req, res) => {
 	//Get the transaction description
 	try {
 		// Parse the callback data sent by M-Pesa
-		const {orderId} = req.params
+		// const orderId = req.params.orderId
+		const bookId = req.params.bookId
+		
 		const callbackData = req.body;
 		const resultCode = callbackData["Body"]["stkCallback"]["ResultCode"];
 		const checkoutId = callbackData["Body"]["stkCallback"]["CheckoutRequestID"];
@@ -113,7 +115,7 @@ lipaNaMpesaCallback = async (req, res) => {
 					}
 					
 					Transaction.create({
-						orderId: orderId,
+						bookId: bookId,
 						checkoutId: checkoutId,
 						date: TransactionDate,
 						phone: phoneNumber,

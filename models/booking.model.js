@@ -42,7 +42,12 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.ARRAY(Sequelize.INTEGER),
 			allowNull: false,
 			defaultValue: []
-		}
+		},
+		status: {
+			type: Sequelize.ENUM('started', 'completed', 'not-started'),
+			defaultValue: 'completed',
+			allowNull: false,
+		},
 	}	, {
 		tableName: 'bookings'
 	});
@@ -87,7 +92,7 @@ module.exports = (sequelize, Sequelize) => {
 	});
 	
 	// Defining the associations
-	Booking.hasMany(Transaction, {foreignKey: 'id'})
+	Booking.hasMany(Transaction, {foreignKey: 'bookId'})
 	Transaction.belongsTo(Booking, {foreignKey: 'bookId'})
 	
 	return {Transaction, Booking}
