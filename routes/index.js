@@ -1,10 +1,13 @@
-const express = require("express");
-const app = express();
-
-const routes = {};
 
 // Importing mpesa routes
 const mpesa = require('../routes/mpesa.routes');
-routes.mpesa = mpesa
+const auth = require('../routes/auth.routes');
+const user = require('../routes/user.routes')
 
-module.exports = routes;
+const routes = {
+	mpesa: mpesa,
+	auth: auth,
+	user: user
+}
+
+module.exports = routes

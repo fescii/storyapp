@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
-    "ngrok": "ngrok http 3000"
+    "ngrok": "ngrok http --domain=nicely-thorough-monster.ngrok-free.app 3000"
   },
   "repository": {
     "type": "git",
@@ -18,6 +18,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.21.0",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
@@ -26,11 +27,12 @@
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^9.0.2",
     "morgan": "~1.9.1",
     "ngrok": "^5.0.0-beta.2",
-    "sequelize": "^6.33.0",
     "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
-    "postgres": "^3.3.4"
+    "postgres": "^3.3.4",
+    "sequelize": "^6.33.0"
   }
 }

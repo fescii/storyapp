@@ -1,7 +1,10 @@
-const configs = {};
-
 // Importing Timestamp Function
 const mpesaConfig = require('../config/mpesa.config');
-configs.mpesaConfig = mpesaConfig
+const dbConfig = require('../config/db.config')
+const authConfig = require('../config/auth.config')
 
-module.exports = configs;
+module.exports = {
+	mpesaConfig: mpesaConfig,
+	dbConfig: dbConfig,
+	authConfig: authConfig
+};

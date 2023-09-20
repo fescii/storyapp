@@ -21,8 +21,8 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			allowNull: false
 		},
-		date_of_birth: {
-			type: Sequelize.STRING,
+		dob: {
+			type: Sequelize.DATE,
 			allowNull: true
 		},
 		bio: {

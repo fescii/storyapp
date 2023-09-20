@@ -6,12 +6,16 @@ module.exports = (sequelize, Sequelize) => {
 			primaryKey: true,
 			autoIncrement: true,
 		},
-		checkout_id: {
+		orderId: {
+			type: Sequelize.STRING,
+			allowNull: false,
+		},
+		checkoutId: {
 			type: Sequelize.STRING,
 			allowNull: false,
 		},
 		date: {
-			type: Sequelize.STRING,
+			type: Sequelize.DATE,
 			allowNull: false,
 		},
 		phone: {

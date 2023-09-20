@@ -13,24 +13,25 @@ currentTimestamp = () => {
 
 localTime = (dateNumeric) => {
 	const dateString = dateNumeric.toString();
-	console.log(dateString)
-	const year = dateString.slice(0, 4);
-	const month = dateString.slice(4, 6) - 1; // Months are zero-based (0-11)
-	const day = dateString.slice(6, 8);
-	const hours = dateString.slice(8, 10);
-	const minutes = dateString.slice(10, 12);
-	const seconds = dateString.slice(12, 14);
+	// console.log(dateString)
+	const year = parseInt(dateString.slice(0, 4));
+	const month = parseInt(dateString.slice(4, 6)) - 1; // Months are zero-based (0-11)
+	const day = parseInt(dateString.slice(6, 8));
+	const hours = parseInt(dateString.slice(8, 10));
+	const minutes = parseInt(dateString.slice(10, 12));
+	const seconds = parseInt(dateString.slice(12, 14));
 	
 	const date = new Date(Date.UTC(year, month, day, hours, minutes, seconds));
 	
 	const options = { timeZone: 'Africa/Nairobi' }; // Set the time zone to East African Time (EAT)
-	return new Intl.DateTimeFormat('en-US', options).format(date);
+	// return new Intl.DateTimeFormat('en-US', options).format(date);
+	return date.toLocaleString('en-US', options)
 };
 
 
-const Time = {
+const timeUtil = {
 	timestamp : currentTimestamp(),
 	localTime: localTime
 };
 
-module.exports = Time;
+module.exports = timeUtil;

@@ -1,7 +1,10 @@
-const controllers = {};
-
 // Importing Timestamp Function
 const Mpesa = require('../controllers/mpesa.controller');
-controllers.Mpesa = Mpesa
+const userController = require('../controllers/user.controller');
+const authController = require('../controllers/auth.controller')
 
-module.exports = controllers;
+module.exports = {
+	Mpesa,
+	userController,
+	authController
+};

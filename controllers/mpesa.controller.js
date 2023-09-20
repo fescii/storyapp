@@ -1,20 +1,17 @@
-const {authtoken} = require("ngrok");
+// const {authtoken} = require("ngrok");
 const axios = require('axios').default;
 require('dotenv').config();
-const { mpesaData } = require('../middleware')
+const { mpesaData, timeUtil } = require('../utils')
 const { mpesaConfig } = require('../config')
-const middlewares = require('../middleware')
 
-const Time = middlewares.Time
-
+//Load Database Object
 const db = require('../models')
-
 const Transaction = db.Transaction
 
 
 getAccessToken = (req, res, next) => {
 	const headers = {
-		"Authorization": "Basic cFJZcjZ6anEwaThMMXp6d1FETUxwWkIzeVBDa2hNc2M6UmYyMkJmWm9nMHFRR2xWOQ=="
+		"Authorization": mpesaConfig.auth
 	};
 	
 	axios
@@ -85,64 +82,64 @@ lipaNaMpesaCallback = async (req, res) => {
 		// Parse the callback data sent by M-Pesa
 		const {orderId} = req.params
 		const callbackData = req.body;
+		const resultCode = callbackData["Body"]["stkCallback"]["ResultCode"];
+		const checkoutId = callbackData["Body"]["stkCallback"]["CheckoutRequestID"];
+		const callbackMetadata = callbackData["Body"]["stkCallback"]["CallbackMetadata"];
 		
-		console.log(orderId)
-		switch (callbackData["Body"]["stkCallback"]["ResultCode"]) {
-			case 0:
-				const callbackMetadata = callbackData["Body"]["stkCallback"]["CallbackMetadata"];
-				const items = callbackMetadata.Item;
-				
-				// Initialize variables to store values
-				let amount,
-				mpesaReceiptNumber,
-				phoneNumber,
-				TransactionDate;
-				
-				
-				// Iterate through items to find specific values
-				for (const item of items) {
-					switch (item.Name) {
-						case "Amount":
-							amount = item.Value;
-							break;
-						case "MpesaReceiptNumber":
-							mpesaReceiptNumber = item.Value;
-							break
-						case "TransactionDate":
-							console.log(item.Value)
-							TransactionDate = Time.localTime(item.Value);
-							break;
-						case "PhoneNumber":
-							phoneNumber = item.Value;
-							break;
+		if (callbackMetadata){
+			switch (resultCode) {
+				case 0:
+					const items = callbackMetadata.Item;
+					// Initialize variables to store values
+					let amount, mpesaReceiptNumber, phoneNumber, TransactionDate;
+					
+					// Iterate through items to find specific values
+					for (const item of items) {
+						switch (item.Name) {
+							case "Amount":
+								amount = item.Value;
+								break;
+							case "MpesaReceiptNumber":
+								mpesaReceiptNumber = item.Value;
+								break
+							case "TransactionDate":
+								console.log(item.Value)
+								TransactionDate = timeUtil.localTime(item.Value);
+								break;
+							case "PhoneNumber":
+								phoneNumber = item.Value;
+								break;
+						}
 					}
-				}
-				
-				console.log("Amount:", amount);
-				console.log("MpesaReceiptNumber:", mpesaReceiptNumber);
-				console.log("PhoneNumber:", phoneNumber);
-				
-				Transaction.create({
-						checkout_id: callbackData["Body"]["stkCallback"]["CheckoutRequestID"],
+					
+					Transaction.create({
+						orderId: orderId,
+						checkoutId: checkoutId,
 						date: TransactionDate,
 						phone: phoneNumber,
 						receipt: mpesaReceiptNumber,
 						amount:  amount
 					})
 					.then(transaction => {
-						console.log(
-							`Transaction created successfully!\n,
-							Transaction: ${transaction}`
-							)
+						console.log(`
+							Transaction created successfully!\n,
+							Transaction: ${transaction.values}`
+						)
 					})
 					.catch(err => {
-						console.log(err.message)
+						console.log(`
+							Error has occurred during Transaction init..\n,
+							Error: ${err.message}`
+						)
 					});
-				
-				break;
-			default:
-				console.log("ResultCode is not 0. Data not available.");
-				break;
+					break;
+				default:
+					console.log("ResultCode is not 0. Data not available.");
+					break;
+			}
+		}
+		else {
+			console.log("Request not successful");
 		}
 		
 		// Send a response to acknowledge receipt of the callback
@@ -151,7 +148,8 @@ lipaNaMpesaCallback = async (req, res) => {
 			message: 'Callback received and processed successfully'
 		});
 		// res.status(200).json({ message: 'Callback received and processed successfully' });
-	} catch (error) {
+	}
+	catch (error) {
 		console.error('Callback processing error:', error);
 		
 		// Handle errors and send an appropriate response
@@ -162,7 +160,7 @@ lipaNaMpesaCallback = async (req, res) => {
 
 confirmPayment = async(req, res) => {
 	try {
-		const url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query";
+		const url = mpesaConfig.confirm_url;
 		
 		let token = req.token;
 		let auth = `Bearer ${token}`;

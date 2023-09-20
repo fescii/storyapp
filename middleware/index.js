@@ -1,12 +1,7 @@
-//Top level imports
+const authJwt = require("./auth.middleware");
+const signUpMiddleware = require("./signUp.middleware");
 
-const middlewares = {};
-
-// Importing
-const Time  = require('./time.middleware');
-const mpesaData = require('../middleware/data.middleware')
-
-middlewares.Time = Time
-middlewares.mpesaData = mpesaData
-
-module.exports = middlewares;
+module.exports = {
+	authJwt,
+	signUpMiddleware
+};

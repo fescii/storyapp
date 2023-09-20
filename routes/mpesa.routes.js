@@ -1,5 +1,3 @@
-// const { verifySignUp } = require("../middleware");
-// const controller = require("../controllers/auth.controller");
 const { Mpesa } = require('../controllers')
 
 module.exports = function(app) {

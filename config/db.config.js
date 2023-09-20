@@ -1,4 +1,4 @@
-module.exports = {
+dbConfig = {
     HOST: process.env['POSTGRES_DB_HOST'],
     USER: process.env['POSTGRES_DB_USER'],
     PASSWORD: process.env['POSTGRES_DB_PASSWORD'],
@@ -12,3 +12,5 @@ module.exports = {
         idle: 10000
     }
 };
+
+module.exports = dbConfig;

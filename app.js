@@ -33,6 +33,9 @@ app.get("/", (req, res) => {
 
 // routes
 routes.mpesa(app)
+routes.auth(app)
+routes.user(app)
+
 
 
 // set port, listen for requests
@@ -84,10 +87,11 @@ async function syncDb(alter){
         });
       }
       else {
-        console.log('Syncing Db Changes...');
-        db.sequelize.sync().then(() => {
-          console.log('All Changes Synced!');
-        });
+        console.log('No Db Changes detected, Everything is Synced!');
+        // console.log('Syncing Db Changes...');
+        // db.sequelize.sync().then(() => {
+        //   console.log('All Changes Synced!');
+        // });
       }
       
     }
