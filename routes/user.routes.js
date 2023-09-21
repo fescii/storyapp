@@ -10,22 +10,22 @@ module.exports = function(app) {
 		next();
 	});
 
-	app.get("/test/all", userController.allAccess);
+	app.get("api/test/all", userController.allAccess);
 
 	app.get(
-		"/test/user",
+		"api/test/user",
 		[authJwt.verifyToken],
 		userController.userBoard
 	);
 
 	app.get(
-		"/test/mod",
+		"api/test/mod",
 		[authJwt.verifyToken, authJwt.isModerator],
 		userController.moderatorBoard
 	);
 
 	app.get(
-		"/test/admin",
+		"api/test/admin",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		userController.adminBoard
 	);

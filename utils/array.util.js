@@ -3,7 +3,6 @@ mapFields = (arr, field) => {
 }
 sumArray = (arr) => arr.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
 
-
 const arrayUtil = {
 	mapFields: mapFields,
 	sumArray : sumArray

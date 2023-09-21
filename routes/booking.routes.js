@@ -10,12 +10,18 @@ module.exports = function(app) {
 		next();
 	});
 	
-	//Make order
-	app.post('/booking/order/make', bookingController.makeOrder);
+	//Make an order
+	app.post('/api/order/make', bookingController.makeOrder);
 	
-	//Check order
-	app.get('/booking/order/status', bookingController.checkStatus);
+	//Check an order
+	app.get('/api/order/status', bookingController.checkStatus);
 	
-	//Get order files
-	app.get('/booking/order/check', bookingMiddleware.checkBalance, bookingController.viewFiles);
+	//Get the order files
+	app.get('/api/order/check', bookingMiddleware.checkBalance, bookingController.viewFiles);
+	
+	//Make a schedule
+	app.post('/api/schedule/make', bookingController.makeSchedule);
+	
+	//Get the order files
+	app.get('/api/schedule/check', bookingController.checkAvailability);
 };

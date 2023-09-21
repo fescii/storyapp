@@ -1,12 +1,11 @@
 const db = require("../models");
 const { timeUtil, arrayUtil} = require('../utils')
-const Booking = db.Booking
-const Transaction = db.Transaction
+const { Booking, Transaction, Schedule, User, sequelize } = db
 const Op = db.Sequelize.Op;
 
 // Booking ..
-makeOrder =  (req, res) => {
-	Booking.create({
+makeOrder = (req, res) => {
+	return Booking.create({
 		orderId: req.body.orderId,
 		name: req.body.name,
 		locationInfo: req.body.locationInfo,
@@ -18,23 +17,194 @@ makeOrder =  (req, res) => {
 		photographers: req.body.photographers,
 	})
 	.then(booking => {
-		res.status(200).send({
-			success: true,
-			orderId: booking.orderId,
-			email: booking.email,
-			phone: booking.phone,
+		Schedule.findOne({
+			where: sequelize.where(sequelize.fn('DATE', sequelize.col('date')), '=', booking.date),
+		})
+		.then(schedule => {
+			if (schedule) {
+				// Use a Set to ensure unique photographer IDs
+				const uniquePhotographers = new Set([...schedule.photographers, ...booking.photographers]);
+				
+				// Convert the Set back to an array
+				schedule.photographers = Array.from(uniquePhotographers);
+				
+				return schedule.save().then(savedSchedule => {
+					if (savedSchedule) {
+						res.status(200).send({
+							success: true,
+							message: 'Booked successfully.',
+						});
+					}
+					else {
+						res.status(400).json({
+							success: true,
+							message: 'Booking was successful, but failed to update schedule',
+						});
+					}
+				});
+			}
+			else {
+				// Create a new record if it doesn't exist
+				return Schedule.create({
+					date: booking.date,
+					photographers: booking.photographers, // Initialize with the new photographers
+					solid: false,
+				})
+				.then(() => {
+					res.status(201).send({
+						success: true,
+						message: 'Booked successfully',
+					});
+				});
+			}
 		});
 	})
 	.catch(err => {
-		console.log(err)
+		console.log(err);
+		return res.status(500).send({
+			success: false,
+			message: 'Could not add your booking, please try again!',
+		});
+	});
+}
+
+makeSchedule = (req, res) => {
+	const { date: dateString, photographers: newPhotographers } = req.body;
+	const solid = req.body.solid || false;
+	
+	// Parse the date string into a Date object
+	const date = timeUtil.formatDate(dateString)
+	
+	// Try to find a record for the specified date (ignoring time)
+	Schedule.findOne({
+		where: sequelize.where(sequelize.fn('DATE', sequelize.col('date')), '=', date),
+	})
+	.then(schedule => {
+		if (schedule) {
+			// Use a Set to ensure unique photographer IDs
+			const uniquePhotographers = new Set([...schedule.photographers, ...newPhotographers]);
+			
+			// Convert the Set back to an array
+			schedule.photographers = Array.from(uniquePhotographers);
+			
+			schedule.solid = solid;
+			return schedule.save().then(savedSchedule => {
+				if (savedSchedule) {
+					res.status(200).send({
+						success: true,
+						message: 'Schedule updated successfully',
+					});
+				}
+				else {
+					res.status(400).json({
+						success: false,
+						message: 'Failed to update schedule',
+					});
+				}
+			});
+		}
+		else {
+			// Create a new record if it doesn't exist
+			return Schedule.create({
+				date: date,
+				photographers: newPhotographers, // Initialize with the new photographers
+				solid: solid,
+			}).then(() => {
+				res.status(201).send({
+					success: true,
+					message: 'Schedule created successfully',
+				});
+			});
+		}
+	})
+	.catch(error => {
+		console.error(error);
 		res.status(500).send({
 			success: false,
-			message: 'Could add your booking try again!'
+			message: 'An error occurred, Try again later',
 		});
 	});
 };
 
-checkStatus =  (req, res, next) => {
+checkAvailability = (req, res) => {
+	// Parse the date string into a Date object
+	const date = timeUtil.formatDate(req.body.date)
+	
+	// Try to find a record for the specified date (ignoring time)
+	Schedule.findOne({
+			where: sequelize.where(sequelize.fn('DATE', sequelize.col('date')), '=', date),
+		})
+		.then(schedule => {
+			if (schedule) {
+				// If there is a schedule for the specified day, get the photographers
+				const photographerIdsInSchedule = schedule.photographers;
+				return User.findAll({
+					where: {
+						id: {
+							[Op.notIn]: photographerIdsInSchedule,
+						},
+						available: true, // Filter by the 'available' field with a value of true
+					},
+				})
+				.then((allAvailableUsers) => {
+					if (allAvailableUsers.length === 0) {
+						return res.status(200).send({
+							available: false,
+							message: 'No available photographers found.',
+						});
+					}
+					return res.status(200).send({
+						available: true,
+						availablePhotographers: allAvailableUsers,
+					});
+				})
+				.catch(error => {
+					console.error(error);
+					return res.status(200).send({
+						available: false,
+						message: 'An error occurred, Try again later',
+					});
+				});
+			}
+			else {
+				return User.findAll({
+					where: {
+						available: true, // Filter by the 'available' field with a value of true
+					},
+				})
+				.then((allAvailableUsers) => {
+					if (allAvailableUsers.length === 0) {
+						return res.status(200).send({
+							available: false,
+							message: 'No available photographers found.',
+						});
+					}
+					else{
+						return res.status(200).send({
+							available: true,
+							availablePhotographers: allAvailableUsers,
+						});
+					}
+				})
+				.catch(error => {
+					console.error(error);
+					return res.status(200).send({
+						available: false,
+						message: 'An error occurred, Try again later',
+					});
+				});
+			}
+		})
+		.catch(error => {
+			console.error(error);
+			res.status(500).send({
+				available: false,
+				message: 'An error occurred, Try again later',
+			});
+		});
+}
+
+checkStatus =  (req, res) => {
 	const whereClause = {}
 	if (req.body.orderId && req.body.email){
 		whereClause[Op.and] = [
@@ -104,7 +274,9 @@ viewFiles =  (req, res) => {
 const bookingController = {
 	makeOrder: makeOrder,
 	checkStatus: checkStatus,
-	viewFiles: viewFiles
+	viewFiles: viewFiles,
+	makeSchedule: makeSchedule,
+	checkAvailability: checkAvailability
 };
 
 module.exports = bookingController;

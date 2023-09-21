@@ -29,9 +29,23 @@ localTime = (dateNumeric) => {
 };
 
 
+formatDate = inputDate => {
+	const dateString = inputDate.toString(); // Your date string
+	const year = dateString.slice(0, 4);
+	const month = dateString.slice(4, 6);
+	const day = dateString.slice(6, 8);
+	const hour = dateString.slice(8, 10);
+	const minute = dateString.slice(10, 12);
+	const second = dateString.slice(12, 14);
+	const date = new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+	return date.toISOString();
+};
+
+
 const timeUtil = {
 	timestamp : currentTimestamp(),
-	localTime: localTime
+	localTime: localTime,
+	formatDate: formatDate
 };
 
 module.exports = timeUtil;

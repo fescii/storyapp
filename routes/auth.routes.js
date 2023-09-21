@@ -11,7 +11,7 @@ module.exports = function(app) {
 	});
 
 	app.post(
-		"/accounts/auth/signup",
+		"/api/auth/signup",
 		[
 			signUpMiddleware.checkDuplicateUsernameOrEmail,
 			signUpMiddleware.checkRolesExisted
@@ -19,5 +19,5 @@ module.exports = function(app) {
 		authController.signup
 	);
 
-	app.post("/accounts/auth/login", authController.signin);
+	app.post("/api/auth/login", authController.signin);
 };

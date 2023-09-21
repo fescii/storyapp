@@ -1,5 +1,6 @@
 module.exports = (sequelize, Sequelize) => {
 	// const {User} = require('../models/user.model')(sequelize, Sequelize)
+	// noinspection JSUnresolvedFunction
 	const	Booking = sequelize.define("bookings", {
 		id: {
 			type: Sequelize.INTEGER,
@@ -44,7 +45,7 @@ module.exports = (sequelize, Sequelize) => {
 			defaultValue: []
 		},
 		status: {
-			type: Sequelize.ENUM('started', 'completed', 'not-started'),
+			type: Sequelize.ENUM('started', 'completed', 'not-started', 'cancelled'),
 			defaultValue: 'not-started',
 			allowNull: false,
 		},
@@ -52,6 +53,7 @@ module.exports = (sequelize, Sequelize) => {
 		tableName: 'bookings'
 	});
 	
+	// noinspection JSUnresolvedFunction
 	const	Transaction = sequelize.define("transactions", {
 		id: {
 			type: Sequelize.INTEGER,
@@ -65,10 +67,6 @@ module.exports = (sequelize, Sequelize) => {
 		},
 		bookId: {
 			type: Sequelize.INTEGER,
-			allowNull: false,
-		},
-		checkoutId: {
-			type: Sequelize.STRING,
 			allowNull: false,
 		},
 		date: {
@@ -91,10 +89,35 @@ module.exports = (sequelize, Sequelize) => {
 		tableName: 'transactions'
 	});
 	
+	// noinspection JSUnresolvedFunction
+	const	Schedule = sequelize.define("schedules", {
+		id: {
+			type: Sequelize.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+		},
+		date: {
+			type: Sequelize.DATE,
+			allowNull: false,
+		},
+		photographers:{
+			type: Sequelize.ARRAY(Sequelize.INTEGER),
+			allowNull: false,
+			defaultValue: []
+		},
+		solid: {
+			type: Sequelize.BOOLEAN,
+			defaultValue: false,
+			allowNull: false,
+		},
+	}	, {
+		tableName: 'schedules'
+	});
+	
 	// Defining the associations
 	Booking.hasMany(Transaction, {foreignKey: 'bookId'})
 	Transaction.belongsTo(Booking, {foreignKey: 'bookId'})
 	
-	return {Transaction, Booking}
+	return {Transaction, Booking, Schedule}
 }
 

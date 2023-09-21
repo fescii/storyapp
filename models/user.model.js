@@ -1,9 +1,14 @@
 module.exports = (sequelize, Sequelize) => {
+	// noinspection JSUnresolvedFunction
 	const User = sequelize.define("users", {
 		id: {
 			type: Sequelize.INTEGER,
 			primaryKey: true,
 			autoIncrement: true,
+		},
+		name: {
+			type: Sequelize.STRING,
+			allowNull: false
 		},
 		username: {
 			type: Sequelize.STRING,
@@ -33,10 +38,16 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.STRING,
 			allowNull: true
 		},
+		available: {
+			type: Sequelize.BOOLEAN,
+			defaultValue: true,
+			allowNull: false,
+		},
 	}, {
 			freezeTableName: true
 	});
 	
+	// noinspection JSUnresolvedFunction
 	const Role = sequelize.define("roles", {
 		id: {
 			type: Sequelize.INTEGER,

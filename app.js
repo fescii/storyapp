@@ -13,8 +13,9 @@ const db = require("./models");
 const Role = db.Role;
 
 //SyncDb
-// noinspection JSIgnoredPromiseFromCall
-syncDb()
+syncDb().then(() => {
+  console.log('Database Synchronized!')
+} )
 
 app.use(cors(corsOptions));
 
@@ -36,6 +37,7 @@ routes.mpesa(app)
 routes.auth(app)
 routes.user(app)
 routes.booking(app)
+routes.admin(app)
 
 // set port, listen for requests
 const PORT = process.env.PORT || 300;
@@ -48,21 +50,21 @@ function initial() {
   Role.create({
     id: 1,
     name: "user"
-  }).then(r => {
+  }).then(() => {
     console.log('role-created successfully!')
   });
   
   Role.create({
     id: 2,
     name: "moderator"
-  }).then(r => {
+  }).then(() => {
     console.log('role-created successfully!')
   });
   
   Role.create({
     id: 3,
     name: "admin"
-  }).then(r => {
+  }).then(() => {
     console.log('role-created successfully!')
   });
 }

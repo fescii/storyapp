@@ -16,6 +16,7 @@ signup =  (req, res) => {
   // let salt = await bcrypt.genSaltSync(8)
   User.create({
       username: req.body.username,
+      name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
       dob: timeUtil.localTime(req.body.dob),

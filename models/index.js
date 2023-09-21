@@ -1,6 +1,9 @@
 const { dbConfig } = require('../config')
 
 const Sequelize = require("sequelize");
+
+
+// noinspection JSValidateTypes
 let sequelize = new Sequelize(
 	dbConfig.DB,
 	dbConfig.USER,
@@ -30,8 +33,8 @@ const {User, Role} = require('../models/user.model')(sequelize, Sequelize);
 Object.assign(db, {User, Role})
 
 // Importing From Post Model
-const {Transaction, Booking} = require('./booking.model')(sequelize, Sequelize);
-Object.assign(db, { Transaction, Booking })
+const {Transaction, Booking, Schedule} = require('./booking.model')(sequelize, Sequelize);
+Object.assign(db, { Transaction, Booking, Schedule })
 
 
 // Adding Role Range
