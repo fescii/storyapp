@@ -1,6 +1,6 @@
+// noinspection JSUnresolvedFunction
+// noinspection JSUnresolvedReference
 module.exports = (sequelize, Sequelize) => {
-	// const {User} = require('../models/user.model')(sequelize, Sequelize)
-	// noinspection JSUnresolvedFunction
 	const	Booking = sequelize.define("bookings", {
 		id: {
 			type: Sequelize.INTEGER,
@@ -53,7 +53,6 @@ module.exports = (sequelize, Sequelize) => {
 		tableName: 'bookings'
 	});
 	
-	// noinspection JSUnresolvedFunction
 	const	Transaction = sequelize.define("transactions", {
 		id: {
 			type: Sequelize.INTEGER,
@@ -89,7 +88,6 @@ module.exports = (sequelize, Sequelize) => {
 		tableName: 'transactions'
 	});
 	
-	// noinspection JSUnresolvedFunction
 	const	Schedule = sequelize.define("schedules", {
 		id: {
 			type: Sequelize.INTEGER,
@@ -120,4 +118,3 @@ module.exports = (sequelize, Sequelize) => {
 	
 	return {Transaction, Booking, Schedule}
 }
-
