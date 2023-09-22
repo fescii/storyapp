@@ -1,19 +1,16 @@
+// noinspection JSUnresolvedReference
+
 const db = require("../models");
 const { authConfig } = require('../config')
 const { timeUtil } = require('../utils')
-const User = db.User;
-const Role = db.Role;
+const { User, Role } = db;
 
 const Op = db.Sequelize.Op;
 
 let jwt = require("jsonwebtoken");
 let bcrypt = require("bcryptjs");
 
-// let salt = await bcrypt.genSaltSync(8)
-// let password = await bcrypt.hashSync(req.body.password,  salt)
 signup =  (req, res) => {
-  // Save User to Database
-  // let salt = await bcrypt.genSaltSync(8)
   User.create({
       username: req.body.username,
       name: req.body.name,

@@ -1,5 +1,5 @@
 const db = require('../models')
-const { Booking } = db
+const { Booking, sequelize } = db
 const Op = db.Sequelize.Op
 const { timeUtil } = require('../utils')
 
@@ -68,10 +68,13 @@ fetchBookings = async (req, res) => {
 			break
 		case 'pending':
 			filter = {
-				status : 'pending'
+				status: 'started',
+				price: {
+					[Op.gt]: sequelize.literal(`(SELECT COALESCE(SUM(transactions.amount), 0) FROM transactions WHERE "bookId" = bookings.id)`)
+				}
 			}
 			totalBookings = await Booking.count({
-				where : filter
+				where: filter
 			})
 			break
 		case 'cancelled':
