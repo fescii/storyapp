@@ -49,9 +49,9 @@ checkRolesExisted = (req, res, next) => {
 	next();
 };
 
-const signUpMiddleware = {
+const signupMiddleware = {
 	checkDuplicateUsernameOrEmail: checkDuplicateUsernameOrEmail,
 	checkRolesExisted: checkRolesExisted
 };
 
-module.exports = signUpMiddleware;
+module.exports = signupMiddleware;
