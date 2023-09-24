@@ -15,12 +15,14 @@ module.exports = function(app) {
 		userController.updateProfile
 	);
 
-	app.get("/api/test/all", userController.allAccess);
-
-	app.get(
-		"/api/test/user",
-		[authJwt.verifyToken],
-		userController.userBoard
+	app.post("/api/v1/user/update-email",
+		[authJwt.verifyToken, userMiddleware.checkDuplicateEmail],
+		userController.updateEmail
+	);
+	
+	app.post("/api/v1/user/update-username",
+		[authJwt.verifyToken, userMiddleware.checkDuplicateUsername],
+		userController.updateUsername
 	);
 
 	app.get(
