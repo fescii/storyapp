@@ -1,5 +1,4 @@
 const { uploadConfig } =require('../config')
-// const upload = multer({ storage: storage })
 
 handleProfilePictureUpload = async (req, res, next) => {
 	uploadConfig.uploadProfile.single('profilePicture')(req, res, async function (err) {
