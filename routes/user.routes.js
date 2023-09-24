@@ -11,7 +11,7 @@ module.exports = function(app) {
 	});
 	
 	app.post('/api/v1/user/update-profile-picture',
-		[authJwt.verifyToken, userMiddleware.upload.single('profilePicture')],
+		[authJwt.verifyToken, userMiddleware.handleProfilePictureUpload],
 		userController.updateProfile
 	);
 

@@ -2,9 +2,11 @@
 const mpesaConfig = require('../config/mpesa.config');
 const dbConfig = require('../config/db.config')
 const authConfig = require('../config/auth.config')
+const uploadConfig = require('../config/upload.config')
 
 module.exports = {
 	mpesaConfig: mpesaConfig,
 	dbConfig: dbConfig,
-	authConfig: authConfig
+	authConfig: authConfig,
+	uploadConfig: uploadConfig
 };
