@@ -3,7 +3,7 @@ const fs = require('fs');
 
 // Configure Multer for file uploads
 profileStorage = multer.diskStorage({
-	destination: async (req, res, file, cb) => {
+	destination: async (req, file, cb) => {
 		const username = req.username;
 		const currentDate = new Date();
 		const year = currentDate.getFullYear();
@@ -14,12 +14,8 @@ profileStorage = multer.diskStorage({
 		try {
 			await fs.mkdir(destination, { recursive: true }, err => {
 				if (err) {
-					// Handling the error by sending an error response
+					// Handling the error
 					console.error(err);
-					return res.status(400).json({
-						success: false,
-						message: 'Error uploading profile picture.'
-					});
 				}
 			});
 			cb(null, destination);
