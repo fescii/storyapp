@@ -1,4 +1,4 @@
-const { authJwt } = require("../middleware");
+const { authJwt, userMiddleware } = require("../middleware");
 const { userController } = require('../controllers')
 
 module.exports = function(app) {
@@ -9,23 +9,28 @@ module.exports = function(app) {
 		);
 		next();
 	});
+	
+	app.post('/api/v1/user/update-profile-picture',
+		[authJwt.verifyToken, userMiddleware.upload.single('profilePicture')],
+		userController.updateProfile
+	);
 
-	app.get("api/test/all", userController.allAccess);
+	app.get("/api/test/all", userController.allAccess);
 
 	app.get(
-		"api/test/user",
+		"/api/test/user",
 		[authJwt.verifyToken],
 		userController.userBoard
 	);
 
 	app.get(
-		"api/test/mod",
+		"/api/test/mod",
 		[authJwt.verifyToken, authJwt.isModerator],
 		userController.moderatorBoard
 	);
 
 	app.get(
-		"api/test/admin",
+		"/api/test/admin",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		userController.adminBoard
 	);

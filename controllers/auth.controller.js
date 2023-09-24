@@ -67,7 +67,7 @@ signin = (req, res) => {
         });
       }
       
-      let token = jwt.sign({id: user.id}, authConfig.secret, {
+      let token = jwt.sign({id: user.id, username: user.username}, authConfig.secret, {
         expiresIn: 86400 // 24 hours
       });
       
