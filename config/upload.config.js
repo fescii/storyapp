@@ -2,8 +2,8 @@ const multer = require('multer');
 const fs = require('fs');
 
 // Configure Multer for file uploads
-const storage = multer.diskStorage({
-	destination: async (req, file, cb) => {
+profileStorage = multer.diskStorage({
+	destination: async (req, res, file, cb) => {
 		const username = req.username;
 		const currentDate = new Date();
 		const year = currentDate.getFullYear();
@@ -14,14 +14,17 @@ const storage = multer.diskStorage({
 		try {
 			await fs.mkdir(destination, { recursive: true }, err => {
 				if (err) {
+					// Handling the error by sending an error response
 					console.error(err);
-					// Handle the error, e.g., by sending an error response
-				} else {
-					// Directory created successfully
+					return res.status(400).json({
+						success: false,
+						message: 'Error uploading profile picture.'
+					});
 				}
 			});
 			cb(null, destination);
-		} catch (err) {
+		}
+		catch (err) {
 			cb(err, null);
 		}
 	},
@@ -35,7 +38,7 @@ const storage = multer.diskStorage({
 
 
 const uploadConfig = {
-	uploadProfile: multer({ storage: storage }),
+	uploadProfile: multer({ storage: profileStorage }),
 };
 
 module.exports = uploadConfig;

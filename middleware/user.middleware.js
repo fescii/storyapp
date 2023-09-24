@@ -1,9 +1,12 @@
 const { uploadConfig } =require('../config')
 
 handleProfilePictureUpload = async (req, res, next) => {
-	uploadConfig.uploadProfile.single('profilePicture')(req, res, async function (err) {
+	uploadConfig.uploadProfile.single('profilePicture')(req, res, async err => {
 		if (err) {
-			return res.status(400).json({ error: 'Error uploading profile picture.' });
+			return res.status(400).json({
+				success: false,
+				message: 'Error uploading profile picture.'
+			});
 		}
 		req.pathName = req.file.path;
 		next()
