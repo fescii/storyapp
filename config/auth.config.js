@@ -1,5 +1,5 @@
 authConfig = {
-    secret: "dark-idea-key"
+    secret: process.env['AUTH_SECRET']
 };
 
 module.exports = authConfig;
