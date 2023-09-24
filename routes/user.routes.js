@@ -10,30 +10,29 @@ module.exports = function(app) {
 		next();
 	});
 	
-	app.post('/api/v1/user/update-profile-picture',
+	app.post('/api/v1/user/update/profile-picture',
 		[authJwt.verifyToken, userMiddleware.handleProfilePictureUpload],
 		userController.updateProfile
 	);
 
-	app.post("/api/v1/user/update-email",
+	app.post("/api/v1/user/update/email",
 		[authJwt.verifyToken, userMiddleware.checkDuplicateEmail],
 		userController.updateEmail
 	);
 	
-	app.post("/api/v1/user/update-username",
+	app.post("/api/v1/user/update/username",
 		[authJwt.verifyToken, userMiddleware.checkDuplicateUsername],
 		userController.updateUsername
 	);
-
-	app.get(
-		"/api/test/mod",
-		[authJwt.verifyToken, authJwt.isModerator],
-		userController.moderatorBoard
+	
+	app.post("/api/v1/user/update/info",
+		[authJwt.verifyToken],
+		userController.updateInfo
 	);
-
-	app.get(
-		"/api/test/admin",
-		[authJwt.verifyToken, authJwt.isAdmin],
-		userController.adminBoard
+	
+	app.post("/api/v1/user/update/password",
+		[authJwt.verifyToken],
+		userController.updatePassword
 	);
+	
 };
