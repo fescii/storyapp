@@ -36,7 +36,6 @@ profileStorage = multer.diskStorage({
 	},
 });
 
-
 const uploadConfig = {
 	uploadProfile: multer({ storage: profileStorage }),
 };
