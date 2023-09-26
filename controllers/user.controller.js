@@ -105,7 +105,7 @@ updateProfile = (req, res) => {
 		// Storing the profilePicturePath in your database
 		User.findOne({
 				where: {
-					username: req.username
+					username: username
 				},
 			})
 			.then(user => {
