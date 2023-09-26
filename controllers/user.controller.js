@@ -41,7 +41,7 @@ updateInfo = (req, res) => {
 		console.log(err)
 		res.status(500).send({
 			success: false,
-			message: 'Internal error has occurred!, try again later'
+			message: 'Internal error has occurred, try again later'
 		})
 	})
 }
