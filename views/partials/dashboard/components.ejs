@@ -1,0 +1,25 @@
+<!--suppress ALL -->
+<script type="module">
+  //Apps-Modals
+  import BookingContainer from "../js/dashboard/component.booking.js";
+  import PortfolioContainer from "../js/dashboard/component.portfolio.js";
+  import ScheduleContainer from "../js/dashboard/component.schedule.js";
+  import PeopleContainer from "../js/dashboard/component.people.js";
+
+  import ScheduleItem from "../js/dashboard/schedule.item.js";
+  import BookingItem from "../js/dashboard/booking.item.js";
+
+  import StatContainer from "../js/dashboard/component.stats.js";
+  import ScheduleModal from "../js/dashboard/schedule.modal.js";
+
+  customElements.define("stat-container", StatContainer);
+  customElements.define("modal-schedule", ScheduleModal);
+
+  customElements.define("booking-item", BookingItem);
+  customElements.define("schedule-item", ScheduleItem);
+
+  customElements.define("booking-container", BookingContainer);
+  customElements.define("portfolio-container", PortfolioContainer);
+  customElements.define("schedule-container", ScheduleContainer);
+  customElements.define("people-container", PeopleContainer);
+</script>

@@ -1,0 +1,171 @@
+/*
+
+Name: aduki, Inc
+Version: 0.1.0
+Author: Fredrick Femar Ochieng'
+Email: isfescii@gmail.com
+
+
+*/
+
+
+@media screen and (max-width: 1200px) {
+  body > main.main > header.header {
+    /* border: 2px solid rgb(160, 100, 11); */
+    padding: 0 5% 0 5%;
+  }
+
+  body > main.main > section.landing > .content-one {
+    /* border: 1px solid rgb(55, 201, 11); */
+    padding: 0 5% 0 5%;
+  }
+
+  body > main.main > section.landing > .numbers {
+    /* border: 5px solid rgb(199, 21, 199); */
+    left: 5%;
+    bottom: 20px;
+  }
+
+  body > main.main > section.landing > .content-one > .text {
+    /* border: 5px solid rgb(199, 21, 199); */
+    padding: 0 0 20px 0;
+  }
+
+  body > main.main > section.landing > .content-one > .image {
+    /* border: 1px solid rgb(0, 0, 0); */
+    width: 50%;
+  }
+
+  body > main.main > section.services {
+    /* border: 1px solid blue; */
+    padding: 50px 5% 70px 5%;
+  }
+
+  body > main.main > section.featured {
+    /* border: 1px solid blue; */
+    padding: 50px 5% 70px 5%;
+  }
+
+  body > main.main > section.services.last {
+    /* border: 5px solid blue;  */
+    padding: 50px 5% 70px 5%;
+  }
+
+  /* 
+    EXPLORE
+  */
+
+  body > main.main > section.content {
+    /* border: 5px solid blue; */
+    padding: 50px 5% 70px 5%;
+  }
+
+  body > main.main > section.content > div.featured {
+    /* border: 1px solid blue; */
+    padding: 70px 5% 50px 5%;
+  }
+
+  .about-top {
+    /* border: 1px solid #808080; */
+    padding: 50px 5% 40px 5%;
+  }
+
+
+  footer.footer {
+    padding: 50px 5% 30px 5%;
+  }
+  
+  
+}
+
+
+@media screen and (max-width: 1050px) {
+  body > main.main > section.content {
+    /* border: 5px solid blue; */
+    padding: 50px 20px 70px 20px;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  body > main.main > header.header {
+    padding: 0 20px;
+  }
+  body > main.main > section.landing > .content-one {
+    padding: 0 20px;
+  }
+  body > main.main > section.landing > .numbers {
+    left: 20px;
+    bottom: 20px;
+  }
+  body > main.main > section.services {
+    /* border: 3px solid rgb(0, 255, 170); */
+    padding: 50px 20px 70px 20px;
+  }
+  body > main.main > section.featured {
+    /* border: 3px solid blue; */
+    padding: 50px 20px 70px 20px;
+  }
+  body > main.main > section.services.last {
+    /* border: 5px solid blue;  */
+    padding: 50px 20px 70px 20px;
+  }
+  body > main.main > section.services.last > .services-head {
+    /* border: 1px solid blue; */
+    width: 90%;
+  }
+
+  body > main.main > section.content {
+    /* border: 5px solid blue; */
+    padding: 50px 20px 70px 20px;
+  }
+
+  body > main.main > section.content > div.featured {
+    /* border: 1px solid blue; */
+    padding: 50px 20px 50px 20px;
+  }
+  
+  body > main.main > section.content > div.section.curated > div.content-items {
+    /* border: 1px solid #404040; */
+    gap: 25px;
+  }
+
+  .about-top {
+    /* border: 1px solid #808080; */
+    padding: 50px 20px 40px 20px;
+  }
+
+
+
+  footer.footer {
+    padding: 50px 20px 30px 20px;
+  }
+}
+
+@media screen and (max-width: 950px) {
+
+
+}
+
+@media screen and (max-width: 870px) {
+
+}
+
+@media screen and (max-width: 800px) {
+
+}
+
+@media screen and (max-width: 700px) {
+
+}
+
+@media screen and (max-width: 600px) {
+  
+}
+
+@media screen and (max-width: 550px) {
+
+}
+
+@media screen and (max-width: 500px) {
+  
+}

@@ -4,30 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Storyteller Arts</title>
+  <!--suppress HtmlUnknownTarget -->
   <link rel="stylesheet" href="css/logon.css">
 </head>
 <body>
-  
-  <%- include ../partials/logon/header %>
-
+  <%- include('../partials/logon/animation'); %>
   <section class="logon">
-    <%- include('partials/logon/content') %>
+    <%- include('../partials/logon/content'); %>
   </section>
-  <script>
-    const inputElements = document.querySelectorAll('section.logon > form > .field > input');
-  
-    inputElements.forEach((input) => {
-      input.addEventListener("focus", () => {
-        input.parentElement.classList.add("focused");
-      });
-  
-      input.addEventListener("blur", () => {
-        if (!input.value) {
-          input.parentElement.classList.remove("focused");
-        }
-      })
-    })
-  </script>
-  
+  <!--suppress HtmlUnknownTarget -->
+  <script src="../js/logon/logon.js" async></script>
 </body>
 </html>

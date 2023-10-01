@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!--suppress HtmlUnknownTarget -->
+  <link rel="stylesheet" href="css/dash.css" />
+
+  <title>Storyteller Arts</title>
+
+  <%- include('../partials/dashboard/components'); %>
+</head>
+
+<body>
+  <main class="main">
+    <%- include('../partials/dashboard/sidebar'); %>
+
+    <section class="content">
+      <%- include('../partials/dashboard/head'); %>
+
+      <div class="content-container" id="content-container">
+        <stat-container bookings="163" date="Sep 23" completed="57" upcoming="33" cancelled="8" visitors="1,400"
+          interactions="1,360">
+        </stat-container>
+      </div>
+
+    </section>
+
+  </main>
+
+  <section id="modal"></section>
+  <!--suppress HtmlUnknownTarget -->
+  <script src="../js/dashboard/tab.js" async></script>
+</body>
+
+</html>

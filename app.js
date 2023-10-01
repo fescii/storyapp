@@ -5,6 +5,10 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 
+app.use(express.static('public'))
+app.set('view engine', 'ejs')
+app.set('views', __dirname+'/views')
+
 let corsOptions = {
   origin: "http://localhost:${process.env.PORT}"
 };
@@ -28,9 +32,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const routes = require('./routes')
 
 // simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to LinkSell Connect application." });
+app.get("/login", (req, res) => {
+  res.render('pages/login')
 });
+
+app.get('/dashboard', (req, res) => {
+  res.render('pages/dashboard')
+})
 
 // routes
 routes.mpesa(app)
