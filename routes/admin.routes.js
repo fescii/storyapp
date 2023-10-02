@@ -14,14 +14,14 @@ module.exports = function(app) {
 	
 	//Change booking status
 	app.post(
-		"/api/admin/update/status",
+		"/api/v1/admin/update/status",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		adminController.updateStatus
 	);
 	
 	//Get bookings
 	app.get(
-		"/api/admin/bookings",
+		"/api/v1/admin/bookings",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		adminController.fetchBookings
 	);

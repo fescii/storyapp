@@ -11,17 +11,17 @@ module.exports = function(app) {
 	});
 	
 	//Make an order
-	app.post('/api/order/make', bookingController.makeOrder);
+	app.post('/api/v1/order/make', bookingController.makeOrder);
 	
 	//Check an order
-	app.get('/api/order/status', bookingController.checkStatus);
+	app.get('/api/v1/order/status', bookingController.checkStatus);
 	
 	//Get the order files
-	app.get('/api/order/check', bookingMiddleware.checkBalance, bookingController.viewFiles);
+	app.get('/api/v1/order/check', bookingMiddleware.checkBalance, bookingController.viewFiles);
 	
 	//Make a schedule
-	app.post('/api/schedule/make', bookingController.makeSchedule);
+	app.post('/api/v1/schedule/make', bookingController.makeSchedule);
 	
 	//Get the order files
-	app.get('/api/schedule/check', bookingController.checkAvailability);
+	app.get('/api/v1/schedule/check', bookingController.checkAvailability);
 };

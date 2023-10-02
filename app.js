@@ -31,21 +31,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const routes = require('./routes')
 
-// simple route
-app.get("/login", (req, res) => {
-  res.render('pages/login')
-});
-
-app.get('/dashboard', (req, res) => {
-  res.render('pages/dashboard')
-})
-
 // routes
 routes.mpesa(app)
 routes.auth(app)
 routes.user(app)
 routes.booking(app)
 routes.admin(app)
+routes.pages(app)
 
 
 // set port, listen for requests

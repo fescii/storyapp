@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
+    "test": "node app.js",
     "ngrok": "ngrok http --domain=nicely-thorough-monster.ngrok-free.app 3000"
   },
   "repository": {

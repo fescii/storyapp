@@ -13,12 +13,12 @@ module.exports = function(app) {
 	// app.get('/mpesa/token', Mpesa.getAuthToken);
 	
 	//lipa na mpesa online
-	app.post('/api/mpesa/lipa', Mpesa.getAccessToken, Mpesa.lipaNaMpesa);
+	app.post('/api/v1/mpesa/lipa', Mpesa.getAccessToken, Mpesa.lipaNaMpesa);
 	
 	//callback url
-	app.post('/api/mpesa/callback/:orderId/:bookId', Mpesa.lipaNaMpesaCallback);
+	app.post('/api/v1/mpesa/callback/:orderId/:bookId', Mpesa.lipaNaMpesaCallback);
 	
 	//callback url
-	app.post('/api/mpesa/confirm/:CheckoutRequestID', Mpesa.getAccessToken, Mpesa.confirmPayment);
+	app.post('/api/v1/mpesa/confirm/:CheckoutRequestID', Mpesa.getAccessToken, Mpesa.confirmPayment);
 	
 };
