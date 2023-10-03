@@ -7,13 +7,13 @@ const booking = require('../routes/booking.routes')
 const admin = require('../routes/admin.routes')
 const pages = require('../routes/pages.routes')
 
-const routes = {
-	mpesa: mpesa,
-	auth: auth,
-	user: user,
-	booking: booking,
-	admin: admin,
-	pages: pages
+const routes = app => {
+	mpesa(app);
+	auth(app);
+	user(app);
+	booking(app);
+	admin(app);
+	pages(app)
 }
 
 module.exports = routes

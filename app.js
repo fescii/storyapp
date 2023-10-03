@@ -29,16 +29,8 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const routes = require('./routes')
-
-// routes
-routes.mpesa(app)
-routes.auth(app)
-routes.user(app)
-routes.booking(app)
-routes.admin(app)
-routes.pages(app)
-
+// Start all routes
+require('./routes')(app)
 
 // set port, listen for requests
 const PORT = process.env.PORT || 300;
