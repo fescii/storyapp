@@ -1,3 +1,5 @@
+const { pagesMiddleware } = require('../middleware')
+
 module.exports = function(app) {
 	app.use(function(req, res, next) {
 		res.header(
@@ -11,7 +13,7 @@ module.exports = function(app) {
 		res.render('pages/login')
 	});
 	
-	app.get('/dashboard', (req, res) => {
+	app.get('/dashboard', pagesMiddleware.verifyToken, (req, res) => {
 		res.render('pages/dashboard')
 	})
 };
