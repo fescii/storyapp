@@ -17,4 +17,5 @@ module.exports = function(app) {
 	app.get('/dashboard', pagesMiddleware.verifyToken, (req, res) => {
 		res.render('pages/dashboard')
 	})
+	
 };
