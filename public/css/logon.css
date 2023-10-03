@@ -19,10 +19,8 @@ html {
   justify-content: center;
   margin: 0;
   font-family: var(--font-main);
-  width: 100%;
   font-size: 16px;
   background-position: 100%;
-  background-size: cover;
   background-size: 1rem 1rem;
   background-color: rgb(248, 249, 250);
   background-image: radial-gradient(circle, rgb(222, 226, 230) 1px, rgba(0, 0, 0, 0) 1px);
@@ -277,7 +275,7 @@ section.logon > .head > .logo  span.art{
   text-align: center;
 }
 
-section.logon > form {
+section.logon > .form {
   margin: 0 0 20px 0;
   width: 90%;
   display: flex;
@@ -287,7 +285,7 @@ section.logon > form {
   gap: 30px;
 }
 
-section.logon > form > .field {
+section.logon > .form > .field {
   /*border: 1px solid black;*/
   width: 100%;
   display: flex;
@@ -298,19 +296,19 @@ section.logon > form > .field {
   position: relative;
 }
 
-section.logon > form > .field > span.error {
+section.logon > .form > .field > span.error {
   color: #ee7752;
   font-size: 0.8rem;
   display: none;
 }
 
-section.logon > form > .field > span.wrapper {
+section.logon > .form > .field > span.wrapper {
   display: flex;
   align-items: center;
   gap: 0;
   width: 100%;
 }
-section.logon > form > .field > span.wrapper > span {
+section.logon > .form > .field > span.wrapper > span {
   border: 1px solid #80808037;
   border-right: none;
   font-size: 1rem;
@@ -323,7 +321,7 @@ section.logon > form > .field > span.wrapper > span {
   align-items: center;
 }
 
-section.logon > form > .field > input {
+section.logon > .form > .field > input {
   border: none;
   background: transparent;
   border: 1px solid #80808037;
@@ -337,7 +335,7 @@ section.logon > form > .field > input {
   transition: border-color 0.3s ease-in-out;
 }
 
-section.logon > form > .field > label {
+section.logon > .form > .field > label {
   color: #666666;
   font-size: 1.1rem;
   font-family: var(--font-alt);
@@ -348,11 +346,11 @@ section.logon > form > .field > label {
   pointer-events: none;
 }
 
-section.logon > form > .field > input:focus {
+section.logon > .form > .field > input:focus {
   border: 1px solid #08b86f60;
 }
 
-section.logon > form > .field.focused > label {
+section.logon > .form > .field.focused > label {
   top: -10px;
   font-size: 0.9rem;
   /* background-color: #ffffff; */
@@ -360,7 +358,7 @@ section.logon > form > .field.focused > label {
   padding: 0 5px;
 }
 
-section.logon > form > button {
+section.logon > .form > button {
   margin: 20px 0 0 0;
   border: none;
   width: 50%;

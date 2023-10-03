@@ -2,8 +2,11 @@ const express = require("express");
 const dotenv = require('dotenv');
 dotenv.config();
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser')
 const cors = require("cors");
 const app = express();
+
+app.use(cookieParser())
 
 app.use(express.static('public'))
 app.set('view engine', 'ejs')

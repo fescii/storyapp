@@ -45,6 +45,7 @@ signup =  (req, res) => {
 };
 
 signin = (req, res) => {
+  console.log(req.body)
   User.findOne({
       where: {
         username: req.body.username
@@ -77,6 +78,7 @@ signin = (req, res) => {
           authorities.push("ROLE_" + roles[i].name.toUpperCase());
         }
         res.status(200).send({
+          success: true,
           id: user.id,
           username: user.username,
           email: user.email,
