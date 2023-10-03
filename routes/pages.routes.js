@@ -6,6 +6,7 @@ module.exports = function(app) {
 			"Access-Control-Allow-Headers",
 			// "token, Origin, Content-Type, Accept"
 		);
+		
 		next();
 	});
 	
