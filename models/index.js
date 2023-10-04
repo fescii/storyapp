@@ -36,8 +36,11 @@ Object.assign(db, {User, Role})
 const {Transaction, Booking, Schedule} = require('./booking.model')(sequelize, Sequelize);
 Object.assign(db, { Transaction, Booking, Schedule })
 
-
 // Adding Role Range
 db.ROLES = ["user", "admin", "moderator"];
+
+//Sync database functions
+const { syncDb, initiateRoles } =  require('./sync.models')(Role, sequelize)
+Object.assign(db, { syncDb, initiateRoles})
 
 module.exports = db;
