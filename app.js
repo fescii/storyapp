@@ -31,11 +31,13 @@ app.use(bodyParser.json());
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Start all routes
+// Require and start all routes
 require('./routes')(app)
 
 // set port, listen for requests
 const PORT = process.env.PORT || 300;
+
+// app listen port
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+  console.log(`Server is listening on port ${PORT}.`);
 });
