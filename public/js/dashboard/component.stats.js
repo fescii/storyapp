@@ -4,7 +4,7 @@ export default class StatContainer extends HTMLElement {
     // We are not even going to touch this.
     super();
 
-    // lets create our shadow root
+    // let's create our shadow root
     this.shadowObj = this.attachShadow({ mode: 'open' });
 
     this.render();

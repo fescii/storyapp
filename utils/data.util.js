@@ -14,7 +14,7 @@ mpesaData = {
 	partyA: "party-sending-funds", //should follow the format:2547xxxxxxxx
 	partyB: mpesaConfig.shortcode,
 	phoneNumber: "party-sending-funds", //should follow the format:2547xxxxxxxx
-	callBackUrl: "https://nicely-thorough-monster.ngrok-free.app/mpesa/callback",
+	callBackUrl: "https://nicely-thorough-monster.ngrok-free.app/api/v1/mpesa/callback",
 	accountReference: "lipa-na-mpesa-tutorial",
 	transaction_desc: "Testing lipa na mpesa functionality"
 };

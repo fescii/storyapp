@@ -19,6 +19,10 @@ getAccessToken = (req, res, next) => {
 		.then(response => {
 			const data = response.data;
 			console.log(data)
+			// const { amount, partyA, phoneNumber} = req.body
+			
+			// Object.assign(req, { amount, partyA, phoneNumber })
+			
 			req.token = data["access_token"];
 			next();
 		})
@@ -33,12 +37,14 @@ getAccessToken = (req, res, next) => {
 
 lipaNaMpesa = async (req, res) => {
 	let token = req.token;
+	const { amount, partyA, phoneNumber} = req.body
+	// const { token, amount, partyA, phoneNumber } = req
+	
 	let auth = `Bearer ${token}`;
 	
-	
-	let amount = "1"; //you can enter any amount
-	let partyA = "254713253018"; //should follow the format:2547xxxxxxxx
-	let phoneNumber = "254713253018"; //should follow the format:2547xxxxxxxx
+	// let amount = "1"; //you can enter any amount
+	// let partyA = "254713253018"; //should follow the format:2547xxxxxxxx
+	// let phoneNumber = "254713253018"; //should follow the format:2547xxxxxxxx
 	
 	// console.log(`${mpesaData.callBackUrl}/${partyA}`)
 	try {
