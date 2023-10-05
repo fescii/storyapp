@@ -8,12 +8,12 @@ const admin = require('../routes/admin.routes')
 const pages = require('../routes/pages.routes')
 
 const routes = app => {
+	pages(app);
 	mpesa(app);
 	auth(app);
 	user(app);
 	booking(app);
 	admin(app);
-	pages(app)
 }
 
 module.exports = routes

@@ -1,25 +1,51 @@
 export default class StatContainer extends HTMLElement {
   constructor() {
-
+    
     // We are not even going to touch this.
     super();
-
+    
     // let's create our shadow root
     this.shadowObj = this.attachShadow({ mode: 'open' });
-
+    
     this.render();
   }
-
-
+  
   render() {
     this.shadowObj.innerHTML = this.getTemplate();
     // this.innerHTML = this.getTemplate();
   }
-
+  
   connectedCallback() {
     // console.log('We are inside connectedCallback');
+	  this.getStats()
   }
-
+  
+  getStats(){
+    const url = '/api/v1/admin/stats'
+    
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        if (!response){
+          console.log('Network error')
+        }
+        
+        response.json()
+          .then(data => {
+            if(data.success){
+              console.log(data)
+            }
+            else {
+              console.log('password error')
+            }
+          })
+      })
+  }
+  
   getTemplate() {
     // Show HTML Here
     return `
@@ -27,8 +53,7 @@ export default class StatContainer extends HTMLElement {
       ${this.getStyles()}
     `
   }
-
-
+  
   getBody() {
     return `
       <div class="top">
@@ -57,7 +82,7 @@ export default class StatContainer extends HTMLElement {
       </div>
     `
   }
-
+  
   getCards() {
     return `
       <div class="cards">
@@ -112,7 +137,7 @@ export default class StatContainer extends HTMLElement {
       </div>
     `
   }
-
+  
   getAnalytics(){
     return `
       <div class="analytic">
@@ -158,7 +183,7 @@ export default class StatContainer extends HTMLElement {
       </div>
     `
   }
-
+  
   getUpcoming(){
     return `
       <div class="booking">
@@ -175,8 +200,8 @@ export default class StatContainer extends HTMLElement {
       </div>
     `
   }
-
-
+  
+  
   getStyles() {
     return `
     <style>

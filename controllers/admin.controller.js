@@ -1,5 +1,5 @@
 const db = require('../models')
-const { Booking, sequelize } = db
+const { Booking, User, sequelize } = db
 const Op = db.Sequelize.Op
 const { timeUtil } = require('../utils')
 
@@ -143,9 +143,76 @@ fetchBookings = async (req, res) => {
 	
 }
 
+getStats = async (req, res) => {
+	const userId = req.userId
+	
+	let today = new Date();
+	const priorDate = new Date(new Date().setDate(today.getDate() - 30));
+	
+	
+	//get user
+	const user = await User.findOne({
+	attributes: ['username', 'profile_picture'],
+		where : {
+			id : userId
+		}
+	})
+	
+	
+	const totalBookings = await Booking.count()
+	const last30Days = await Booking.count({
+		where : {
+			date: {
+				[Op.gte]: priorDate
+			}
+		}
+	})
+	
+	const totalCompleted = await Booking.count({
+		where: {
+			status : 'completed'
+		}
+	})
+	
+	const totalCancelled = await Booking.count({
+		where: {
+			status : 'cancelled'
+		}
+	})
+	
+	const totalUpcoming = await Booking.count({
+		where : {
+			date: {
+				[Op.gte]: today
+			}
+		}
+	})
+	
+	const upcomingBooking = await Booking.findOne({
+		where : {
+			date: {
+				[Op.gte]: today
+			}
+		}
+	})
+	
+	return res.status(201).json({
+		success: true,
+		user,
+		totalBookings,
+		totalCompleted,
+		totalCancelled,
+		totalUpcoming,
+		upcomingBooking
+		
+	})
+	
+}
+
 const adminController = {
 	updateStatus: updateStatus,
-	fetchBookings: fetchBookings
+	fetchBookings: fetchBookings,
+	getStats: getStats
 }
 
 module.exports = adminController

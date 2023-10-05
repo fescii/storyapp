@@ -9,6 +9,7 @@ module.exports = function(app) {
 			"Access-Control-Allow-Headers",
 			"x-access-token, Origin, Content-Type, Accept"
 		);
+		
 		next();
 	});
 	
@@ -17,6 +18,13 @@ module.exports = function(app) {
 		"/api/v1/admin/update/status",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		adminController.updateStatus
+	);
+	
+	//Get admin stats
+	app.get(
+		"/api/v1/admin/stats",
+		[authJwt.verifyToken, authJwt.isAdmin],
+		adminController.getStats
 	);
 	
 	//Get bookings
