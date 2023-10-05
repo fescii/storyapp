@@ -245,7 +245,7 @@ export default class StatContainer extends HTMLElement {
         /* border: 1px solid #808080; */
         margin: 0;
         padding: 0;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 4rem;
         color: transparent;
         background:  rgb(223, 121, 26);
