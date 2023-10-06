@@ -10,6 +10,7 @@ profileStorage = multer.diskStorage({
 		const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
 		const day = currentDate.getDate().toString().padStart(2, '0');
 		const destination = `public/users/profile/${year}/${month}/${day}/${username}/`;
+		const pathToStore =  `users/profile/${year}/${month}/${day}/${username}/`
 		
 		try {
 			await fs.mkdir(destination, { recursive: true }, err => {

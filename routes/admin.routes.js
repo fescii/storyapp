@@ -25,12 +25,19 @@ module.exports = function(app) {
 		"/api/v1/admin/stats",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		adminController.getStats
-	);
+	)
 	
 	//Get bookings
 	app.get(
 		"/api/v1/admin/bookings",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		adminController.fetchBookings
-	);
-};
+	)
+	
+	//Get people
+	app.get(
+		"/api/v1/admin/people",
+		[authJwt.verifyToken, authJwt.isAdmin],
+		adminController.fetchPeople
+	)
+}

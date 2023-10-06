@@ -17,10 +17,11 @@ export default class StatContainer extends HTMLElement {
   
   connectedCallback() {
     // console.log('We are inside connectedCallback');
-	  this.getStats()
+    this.getStats()
   }
   
   getStats(){
+    const contentContainer = this.shadowObj.querySelector('#content-container')
     const url = '/api/v1/admin/stats'
     
     fetch(url, {
@@ -37,10 +38,11 @@ export default class StatContainer extends HTMLElement {
         response.json()
           .then(data => {
             if(data.success){
-              console.log(data)
+              // console.log(data)
+              contentContainer.innerHTML = this.getBody(data);
             }
             else {
-              console.log('password error')
+              console.log('error')
             }
           })
       })
@@ -49,15 +51,23 @@ export default class StatContainer extends HTMLElement {
   getTemplate() {
     // Show HTML Here
     return `
-      ${this.getBody()}
+      <div class="content-container" id="content-container">
+        ${this.getLoader()}
+      </div>
       ${this.getStyles()}
     `
   }
   
-  getBody() {
+  getLoader(){
+    return `
+      <div class="loader"></div>
+    `
+  }
+  
+  getBody(data) {
     return `
       <div class="top">
-        <h1 class="number">${this.getAttribute('bookings')}</h1>
+        <h1 class="number">${data.totalBookings}</h1>
         <div class="other">
           <p class="name">Bookings</p>
           <span class="text">Since ${this.getAttribute('date')}</span>
@@ -67,9 +77,9 @@ export default class StatContainer extends HTMLElement {
         <div class="left">
           <div class="head">
             <h3 class="title">Bookings</h3>
-            <span class="total">${this.getAttribute('bookings')} Bookings</span>
+            <span class="total">${data.totalBookings} Bookings</span>
           </div>      
-          ${this.getCards()}
+          ${this.getCards(data.totalCancelled, data.totalCompleted, data.totalUpcoming)}
         </div>
         <div class="right">
           ${this.getAnalytics()}
@@ -77,13 +87,13 @@ export default class StatContainer extends HTMLElement {
       </div>
       <div class="upcoming">
         <div class="bookings">
-          ${this.getUpcoming()}
+          ${this.getUpcoming(data.upcomingBooking)}
         </div>
       </div>
     `
   }
   
-  getCards() {
+  getCards(cancelled, completed, upcoming) {
     return `
       <div class="cards">
         <div class="card completed">
@@ -95,7 +105,7 @@ export default class StatContainer extends HTMLElement {
           </span>
           <p class="title">Completed</p>
           <div class="date">
-            <span class="no">${this.getAttribute('completed')}</span>
+            <span class="no">${completed}</span>
             <span class="date">${this.getAttribute('date')}</span>
           </div>
         </div>
@@ -116,7 +126,7 @@ export default class StatContainer extends HTMLElement {
           </span>
           <p class="title">Upcoming</p>
           <div class="date">
-            <span class="no">${this.getAttribute('upcoming')}</span>
+            <span class="no">${upcoming}</span>
             <span class="date">${this.getAttribute('date')}</span>
           </div>
         </div>
@@ -130,7 +140,7 @@ export default class StatContainer extends HTMLElement {
           </span>
           <p class="title">Cancelled</p>
           <div class="date">
-            <span class="no">${this.getAttribute('cancelled')}</span>
+            <span class="no">${cancelled}</span>
             <span class="date">${this.getAttribute('date')}</span>
           </div>
         </div>
@@ -184,17 +194,21 @@ export default class StatContainer extends HTMLElement {
     `
   }
   
-  getUpcoming(){
+  getUpcoming(data){
+    const date = new Date(data.date)
+    const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    const day = daysOfWeek[date.getDay()]
+    const dayOfMonth = date.getDate() < 10 ? `0${date.getDate()}` : date.getDate().toString();
     return `
       <div class="booking">
         <div class="date">
-          <span class="day">Mon</span>
-          <span class="no">20</span>
+          <span class="day">${day}</span>
+          <span class="no">${dayOfMonth}</span>
         </div>
         <div class="info">
-          <p class="title">Nakuru showgrounds</p>
-          <span class="by">Fredrick Ochieng</span>
-          <span class="time">10:00</span>
+          <p class="title">${data.locationInfo}</p>
+          <span class="by">${data.name}</span>
+          <span class="time">All day</span>
         </div>
         <div class="up">Up next</div>
       </div>
@@ -219,6 +233,48 @@ export default class StatContainer extends HTMLElement {
         /* align-items: center; */
         justify-content: start;
         gap: 20px;
+      }
+      
+      #content-container {
+        width: 100%;
+        min-width: 100%;
+        min-height: 80vh;
+        display: flex;
+        flex-flow: column;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .loader {
+        width: 28px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #E3AAD6;
+        transform-origin: top;
+        display: grid;
+        animation: l3-0 1s infinite linear;
+      }
+      .loader::before,
+      .loader::after {
+        content: "";
+        grid-area: 1/1;
+        background:#F4DD51;
+        border-radius: 50%;
+        transform-origin: top;
+        animation: inherit;
+        animation-name: l3-1;
+      }
+      .loader::after {
+        background: #F10C49;
+        --s: 180deg;
+      }
+      @keyframes l3-0 {
+        0%,20% {transform: rotate(0)}
+        100%   {transform: rotate(360deg)}
+      }
+      @keyframes l3-1 {
+        50% {transform: rotate(var(--s,90deg))}
+        100% {transform: rotate(0)}
       }
 
       .top {
@@ -280,7 +336,7 @@ export default class StatContainer extends HTMLElement {
         /* border: 1px solid #808080; */
         margin: 0;
         padding: 5px 0;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 0.9rem;
         font-weight: 500;
         text-align: center;
@@ -306,12 +362,12 @@ export default class StatContainer extends HTMLElement {
         gap: 0;
         border-radius: 20px;
         padding: 20px 25px;
-        background: #fff;
-        background-position-x: 0%;
-        background-position-y: 0%;
+        background-color: #fff;
+        background-position-x: 0;
+        background-position-y: 0;
         background-repeat: repeat;
         background-image: none;
-        box-shadow: 8px 8px 30px 0px rgba(42, 67, 113, 0.034);
+        box-shadow: 8px 8px 30px 0 rgba(42, 67, 113, 0.034);
         /* border-radius: 15px; */
       }
 
@@ -329,7 +385,7 @@ export default class StatContainer extends HTMLElement {
       .body > .left .head h3 {
         /* border: 1px solid #808080; */
         margin: 0;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 1.2rem;
         font-weight: 500;
         color: #404040;
@@ -338,7 +394,7 @@ export default class StatContainer extends HTMLElement {
       .body > .left .head span.total {
         /* border: 1px solid #808080; */
         margin: 0;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 0.93rem;
         /* font-weight: 500; */
         color: #808080;
@@ -354,7 +410,6 @@ export default class StatContainer extends HTMLElement {
         gap: 25px;
       }
 
-
       .body > .left .cards > .card {
         border: 1px solid #e7e7e7;
         padding: 15px 20px;
@@ -366,7 +421,7 @@ export default class StatContainer extends HTMLElement {
         border-radius: 20px;
       }
 
-      .body > .left .cards > .card .logo { 
+      .body > .left .cards > .card .logo {
         /* border: 1px solid #80e280; */
         padding: 0;
         margin: 0 0 15px 0;
@@ -384,27 +439,27 @@ export default class StatContainer extends HTMLElement {
         height: 30px;
       }
 
-      .body > .left .cards > .card.completed .logo { 
+      .body > .left .cards > .card.completed .logo {
         background-color: #099eef18;
       }
 
-      .body > .left .cards > .card.completed .logo svg path { 
+      .body > .left .cards > .card.completed .logo svg path {
         fill: #08b86f;
       }
 
-      .body > .left .cards > .card.upcoming .logo { 
+      .body > .left .cards > .card.upcoming .logo {
         background-color: #ffcc004c;
       }
 
-      .body > .left .cards > .card.upcoming .logo svg path { 
+      .body > .left .cards > .card.upcoming .logo svg path {
         fill: #ff9500;
       }
 
-      .body > .left .cards > .card.cancelled .logo { 
+      .body > .left .cards > .card.cancelled .logo {
         background-color: #fb482c19;
       }
 
-      .body > .left .cards > .card.cancelled .logo svg path { 
+      .body > .left .cards > .card.cancelled .logo svg path {
         fill: #f84125;
       }
 
@@ -427,7 +482,7 @@ export default class StatContainer extends HTMLElement {
 
       .body > .left .cards > .card > .date .no {
         border-right: 1px solid #80808087;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         line-height: 1;
         font-size: 0.9rem;
         padding: 0 8px 0 0;
@@ -436,7 +491,7 @@ export default class StatContainer extends HTMLElement {
       }
 
       .body > .left .cards > .card > .date .date {
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 0.9rem;
         padding: 0 0 0 8px;
         /* font-weight: 500; */
@@ -463,11 +518,11 @@ export default class StatContainer extends HTMLElement {
         border-radius: 15px;
         padding: 15px 20px;
         background: #fff;
-        background-position-x: 0%;
-        background-position-y: 0%;
+        background-position-x: 0;
+        background-position-y: 0;
         background-repeat: repeat;
         background-image: none;
-        box-shadow: 8px 8px 30px 0px rgba(42, 67, 113, 0.034);
+        box-shadow: 8px 8px 30px 0 rgba(42, 67, 113, 0.034);
         /* border-radius: 15px; */
       }
 
@@ -482,14 +537,14 @@ export default class StatContainer extends HTMLElement {
       .body > .right .analytic > .data  p{
         margin: 0;
         color: #404040;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-weight: 500;
       }
 
       .body > .right .analytic > .data  span{
         margin: 0;
         color: #808080;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 0.9rem;
       }
 
@@ -511,6 +566,7 @@ export default class StatContainer extends HTMLElement {
       }
 
       .upcoming {
+        width: 100%;
         margin: 0;
         padding: 0;
         display: flex;
@@ -543,11 +599,11 @@ export default class StatContainer extends HTMLElement {
         justify-content: start;
         gap: 17px;
         background: #fff;
-        background-position-x: 0%;
-        background-position-y: 0%;
+        background-position-x: 0;
+        background-position-y: 0;
         background-repeat: repeat;
         background-image: none;
-        box-shadow: 8px 8px 30px 0px rgba(42, 67, 113, 0.034);
+        box-shadow: 8px 8px 30px 0 rgba(42, 67, 113, 0.034);
         border-radius: 15px;
       }
 
@@ -562,7 +618,7 @@ export default class StatContainer extends HTMLElement {
       .upcoming > .bookings .booking > .info  p {
         margin: 0;
         color: #404040;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-weight: 500;
         /* font-size: 1.1rem; */
       }
@@ -570,7 +626,7 @@ export default class StatContainer extends HTMLElement {
       .upcoming > .bookings .booking > .info  span {
         margin: 0;
         color: #808080;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 0.85rem;
       }
 
@@ -593,7 +649,7 @@ export default class StatContainer extends HTMLElement {
       .upcoming > .bookings .booking > .date > span.day {
         margin: 0;
         color: #808080;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 0.9rem;
         line-height: 1;
       }
@@ -602,7 +658,7 @@ export default class StatContainer extends HTMLElement {
         margin: 0;
         display: inline-block;
         color:  #08b86f;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-weight: 500;
         font-size: 1.6rem;
         line-height: 1;
@@ -613,12 +669,10 @@ export default class StatContainer extends HTMLElement {
         position: absolute;
         right: 20px;
         color: #808080;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-size: 1rem;
         line-height: 1;
       }
-    
-      
     </style>
     `
   }

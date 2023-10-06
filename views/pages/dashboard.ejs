@@ -17,10 +17,10 @@
     <%- include('../partials/dashboard/sidebar'); %>
 
     <section class="content">
-      <%- include('../partials/dashboard/head'); %>
+      <%- include('../partials/dashboard/head', {user: user, last30Days: last30Days}); %>
 
       <div class="content-container" id="content-container">
-        <stat-container bookings="163" date="Sep 23" completed="57" upcoming="33" cancelled="8" visitors="1,400"
+        <stat-container date="Sep 23" visitors="1,400"
           interactions="1,360">
         </stat-container>
       </div>

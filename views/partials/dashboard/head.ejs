@@ -1,6 +1,6 @@
 <div class="head">
   <div class="bookings">
-    <span class="no">37</span>
+    <span class="no"><%= last30Days %></span>
     <div class="text-side">
       <span class="bar"></span>
       <span class="text">Bookings</span>
@@ -26,10 +26,14 @@
         <span class="dot">
           <span></span>
         </span>
-        <img src="img/explore/by/femar.jpg" alt="Profile Photo" srcset="" />
+        <% if (user.profile_picture) { %>
+          <img src="<%= user.profile_picture %>" alt="Profile Photo"/>
+        <% } else {%>
+          <img src="https://eu.ui-avatars.com/api/?background=23a6d5&amp;name=<%= user.name %>&amp;size=250&amp;color=fff" alt="Profile">
+        <%}%>
       </div>
       <span class="name">
-        <span class="username">Fredrick</span>
+        <span class="username"><%= user.username %></span>
         <span class="status">active</span>
       </span>
     </div>

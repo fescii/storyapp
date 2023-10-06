@@ -99,13 +99,14 @@ updatePassword = (req, res) => {
 
 updateProfile = (req, res) => {
 	try {
-		const { username } = req.username;
-		const profilePicturePath = req.file.path;
+		// const { username } = req.username;
+		// console.log(`Controller: ${req.username}`)
+		const profilePicturePath = req.file.path.replace('public/', '');
 		
 		// Storing the profilePicturePath in your database
 		User.findOne({
 				where: {
-					username: username
+					username: req.username
 				},
 			})
 			.then(user => {

@@ -6,7 +6,7 @@ const { User, Role} = db;
 verifyToken = (req, res, next) => {
 	// let token = req.headers["x-access-token"];
 	
-	let token = req.cookies['x-access-token']
+	let token = req.cookies['x-access-token'] || req.headers["x-access-token"]
 	
 	if (!token) {
 		return res.status(403).send({

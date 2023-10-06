@@ -149,24 +149,7 @@ getStats = async (req, res) => {
 	let today = new Date();
 	const priorDate = new Date(new Date().setDate(today.getDate() - 30));
 	
-	
-	//get user
-	const user = await User.findOne({
-	attributes: ['username', 'profile_picture'],
-		where : {
-			id : userId
-		}
-	})
-	
-	
 	const totalBookings = await Booking.count()
-	const last30Days = await Booking.count({
-		where : {
-			date: {
-				[Op.gte]: priorDate
-			}
-		}
-	})
 	
 	const totalCompleted = await Booking.count({
 		where: {
@@ -198,7 +181,6 @@ getStats = async (req, res) => {
 	
 	return res.status(201).json({
 		success: true,
-		user,
 		totalBookings,
 		totalCompleted,
 		totalCancelled,
@@ -206,13 +188,64 @@ getStats = async (req, res) => {
 		upcomingBooking
 		
 	})
+}
+
+dashboardHeader = async (req, res) => {
+	let today = new Date();
+	const priorDate = new Date(new Date().setDate(today.getDate() - 30));
 	
+	//get user
+	const user = await User.findOne({
+		attributes: ['username', 'name', 'profile_picture'],
+		where: {
+			id: req.userId
+		}
+	})
+	
+	const last30Days = await Booking.count({
+		where : {
+			date: {
+				[Op.gt]: priorDate,
+				[Op.lt]: today
+			}
+		}
+	})
+	
+	if (user && last30Days){
+		res.render('pages/dashboard', {
+			user: user, last30Days: last30Days
+		})
+	}
+}
+
+fetchPeople = (req, res) => {
+	User.findAll()
+		.then(users => {
+			if(!users){
+				return res.status(200).json({
+					success: false,
+					message: 'No Users found.'
+				})
+			}
+			
+			return res.status(200).json({
+				success: true,
+				users
+			})
+			
+		})
+		.catch(err => {
+			console.log(err)
+			return res.status(500).json({
+				success: false,
+				message: 'An error has occurred!'
+			})
+		})
 }
 
 const adminController = {
-	updateStatus: updateStatus,
-	fetchBookings: fetchBookings,
-	getStats: getStats
+	updateStatus, fetchBookings, getStats,
+	dashboardHeader, fetchPeople
 }
 
 module.exports = adminController

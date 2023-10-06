@@ -1,4 +1,5 @@
 const { pagesMiddleware } = require('../middleware')
+const { adminController} = require("../controllers");
 
 module.exports = function(app) {
 	app.use(function(req, res, next) {
@@ -14,8 +15,9 @@ module.exports = function(app) {
 		res.render('pages/login')
 	});
 	
-	app.get('/dashboard', pagesMiddleware.verifyToken, (req, res) => {
-		res.render('pages/dashboard')
-	})
+	app.get(
+		"/dashboard", pagesMiddleware.verifyToken,
+		adminController.dashboardHeader
+	);
 	
 };
