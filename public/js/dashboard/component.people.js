@@ -1,12 +1,12 @@
 export default class PeopleContainer extends HTMLElement {
   constructor() {
-
+    
     // We are not even going to touch this.
     super();
-
+    
     // let's create our shadow root
     this.shadowObj = this.attachShadow({ mode: 'open' });
-
+    
     this.render();
   }
   render() {
@@ -15,7 +15,7 @@ export default class PeopleContainer extends HTMLElement {
   }
   connectedCallback() {
     // console.log('We are inside connectedCallback');
-
+    
     this.switchTabs()
     this.fetchPeople()
   }
@@ -58,7 +58,7 @@ export default class PeopleContainer extends HTMLElement {
         tab.addEventListener('click', (e) => {
           e.preventDefault()
           e.stopPropagation()
-
+          
           activeTab.classList.remove('active')
           tab.classList.add('active')
           activeTab = tab
@@ -88,7 +88,7 @@ export default class PeopleContainer extends HTMLElement {
       ${this.getStyles()}
     `
   }
-
+  
   getBody() {
     return `
       ${this.getHeader()}
@@ -105,7 +105,7 @@ export default class PeopleContainer extends HTMLElement {
       <div class="loader"></div>
     `
   }
-
+  
   getHeader() {
     return `
       <div class="header">
@@ -130,8 +130,8 @@ export default class PeopleContainer extends HTMLElement {
       </div>
     `
   }
-
-
+  
+  
   getPeople(people) {
     let html = ''
     people.forEach((person, index) => {
@@ -168,8 +168,8 @@ export default class PeopleContainer extends HTMLElement {
     
     return html
   }
-
-
+  
+  
   addPerson() {
     return `
       <div class="add">
@@ -203,7 +203,7 @@ export default class PeopleContainer extends HTMLElement {
       </div>
     `
   }
-
+  
   getStyles() {
     return `
     <style>
