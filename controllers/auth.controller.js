@@ -11,6 +11,7 @@ let jwt = require("jsonwebtoken");
 let bcrypt = require("bcryptjs");
 
 signup =  (req, res) => {
+  console.log(`Body: ${req.body.username}`)
   User.create({
       username: req.body.username,
       name: req.body.name,
@@ -29,13 +30,19 @@ signup =  (req, res) => {
           }
         }).then(roles => {
           user.setRoles(roles).then(() => {
-            res.send({message: "User was registered successfully!"});
+            res.send({
+              success: true,
+              message: "User was registered successfully!"
+            });
           });
         });
       } else {
         // user role = 1
         user.setRoles([1]).then(() => {
-          res.send({message: "User was registered successfully!"});
+          res.send({
+            success: true,
+            message: "User was registered successfully!"
+          });
         });
       }
     })

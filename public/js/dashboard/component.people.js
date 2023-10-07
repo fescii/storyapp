@@ -49,6 +49,86 @@ export default class PeopleContainer extends HTMLElement {
     
   }
   
+  validateInputs(){
+    const url = "/api/v1/auth/signup"
+    const button = this.shadowObj.querySelector('.add > .action > button')
+    
+    button.addEventListener('click', e => {
+      e.preventDefault()
+      const inputs = this.shadowObj.querySelectorAll('.add > .field > input')
+      let isValid = true
+      const data = {
+        "roles" : ["user"]
+      }
+      
+      inputs.forEach(input => {
+        if (input.value.length < 5 ) {
+          isValid = false
+          let span = input.parentElement.querySelector('span.error')
+          span.style.display = 'flex'
+          
+          setTimeout(() => {
+            span.style.dsiplay = 'none'
+          }, 2000)
+        }
+        else {
+          data[`${input.dataset.name}`] = input.value
+        }
+      })
+      if(isValid){
+        this.signUpRequest(url, data)
+      }
+      
+    })
+  }
+  
+  signUpRequest(url, data){
+    console.log(data)
+    
+    const { username, name, email, phone, password, roles } = data
+    
+    const dob = this.currentTimestamp(data['dob'])
+    
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username, name, email, phone, dob, password, roles
+      })
+    })
+      .then(response => {
+        if (!response){
+          console.log('Network error')
+        }
+        
+        response.json()
+          .then(data => {
+            if(data.success){
+              // console.log(data)
+              // contentContainer.innerHTML = this.getPeople(data.users);
+              this.fetchPeople()
+            }
+            else {
+              console.log('error')
+            }
+          })
+      })
+  }
+  
+  currentTimestamp = (input) => {
+    const date = new Date(input);
+    
+    let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    let day = String(date.getDate()).padStart(2, '0');
+    let hour = String(date.getHours()).padStart(2, '0');
+    let minute = String(date.getMinutes()).padStart(2, '0');
+    let second = String(date.getSeconds()).padStart(2, '0');
+    
+    return `${date.getFullYear()}${month}${day}${hour}${minute}${second}`;
+  };
+  
   switchTabs() {
     const tabs = this.shadowObj.querySelectorAll('.header > span.option')
     let activeTab = this.shadowObj.querySelector('.header > span.option.active')
@@ -70,7 +150,8 @@ export default class PeopleContainer extends HTMLElement {
               this.fetchPeople()
               break;
             case 'add':
-              
+              contentContainer.innerHTML = this.addPerson()
+              this.validateInputs()
               break;
             default:
               this.fetchPeople()
@@ -131,7 +212,6 @@ export default class PeopleContainer extends HTMLElement {
     `
   }
   
-  
   getPeople(people) {
     let html = ''
     people.forEach((person, index) => {
@@ -169,33 +249,38 @@ export default class PeopleContainer extends HTMLElement {
     return html
   }
   
-  
   addPerson() {
     return `
       <div class="add">
         <div class="field">
           <label for="name">Name</label>
-          <input type="text" name="name" id="name" required>
+          <input type="text" name="name" id="name" data-name="name" required>
+          <span class="error">Name is required</span>
         </div>
         <div class="field">
           <label for="username">Username</label>
-          <input type="text" name="username" id="username" required>
+          <input type="text" name="username" id="username" data-name="username" required>
+          <span class="error">At least 5 characters</span>
         </div>
         <div class="field">
           <label for="password">Password</label>
-          <input type="password" name="password" id="password" required>
+          <input type="password" name="password" id="password" data-name="password" required>
+          <span class="error">Password is required</span>
         </div>
         <div class="field">
           <label for="email">Email</label>
-          <input type="email" name="email" id="email" required>
+          <input type="email" name="email" id="email" data-name="email" required>
+          <span class="error">Email is required</span>
         </div>
         <div class="field">
           <label for="number">Phone</label>
-          <input type="tel" name="number" id="number" required>
+          <input type="tel" name="number" id="number" data-name="phone" required>
+          <span class="error">Input valid phone</span>
         </div>
         <div class="field">
           <label for="dob">Date of birth</label>
-          <input type="date" name="dob" id="dob" required>
+          <input type="date" name="dob" id="dob" data-name="dob" required>
+          <span class="error">Select valid date</span>
         </div>
         <div class="action">
           <button type="button">Create user</button>
@@ -330,7 +415,8 @@ export default class PeopleContainer extends HTMLElement {
         flex-flow: row;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: start;
+        justify-content: center;
+        min-height: 80vh;
         gap: 30px;
       }
 
@@ -552,6 +638,12 @@ export default class PeopleContainer extends HTMLElement {
         padding: 10px 12px;
         border-radius: 12px;
         color: #404040;
+      }
+      
+      .add > .field > span.error {
+        color: #ee7752;
+        font-size: 0.8rem;
+        display: none;
       }
 
       .add > .field > input:focus {

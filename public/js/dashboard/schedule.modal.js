@@ -20,8 +20,6 @@ export default class ScheduleModal extends HTMLElement {
   connectedCallback() {
     console.log('We are inside connectedCallback');
     
-    console.log('duhcudcucuygryc');
-    
     this.disableScroll()
 
 
