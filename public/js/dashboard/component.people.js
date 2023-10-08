@@ -407,7 +407,6 @@ export default class PeopleContainer extends HTMLElement {
       }
 
       .content {
-        /* border: 1px solid #808080; */
         margin: 0;
         padding: 20px 0;
         width: 100%;
