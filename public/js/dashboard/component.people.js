@@ -1,194 +1,144 @@
-export default class PeopleContainer extends HTMLElement {
-  constructor() {
-    
-    // We are not even going to touch this.
-    super();
-    
-    // let's create our shadow root
-    this.shadowObj = this.attachShadow({ mode: 'open' });
-    
-    this.render();
-  }
-  render() {
-    this.shadowObj.innerHTML = this.getTemplate();
-    // this.innerHTML = this.getTemplate();
-  }
+const PeopleContainer = {
+  type: 'people-container',
+  template: `
+    ${this.getBody()}
+    ${this.getStyles()}
+  `,
+  props: {},
   connectedCallback() {
-    // console.log('We are inside connectedCallback');
-    
-    this.switchTabs()
-    this.fetchPeople()
-  }
+    // Initialize the component
+    this.switchTabs();
+    this.fetchPeople();
+  },
+  getStyles() {
+	  const linkElem = document.createElement('link');
+	  linkElem.rel = 'stylesheet';
+	  linkElem.href = '/css/custom/people-container.css';
+	  return linkElem
+  },
+};
+
+PeopleContainer.prototype.addPerson = () => {
+  return `
+    <div class="add">
+      <div class="field">
+        <label for="name">Name</label>
+        <input type="text" name="name" id="name" data-name="name" required>
+        <span class="error">Name is required</span>
+      </div>
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" data-name="username" required>
+        <span class="error">At least 5 characters</span>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" name="password" id="password" data-name="password" required>
+        <span class="error">Password is required</span>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" data-name="email" required>
+        <span class="error">Email is required</span>
+      </div>
+      <div class="field">
+        <label for="number">Phone</label>
+        <input type="tel" name="number" id="number" data-name="phone" required>
+        <span class="error">Input valid phone</span>
+      </div>
+      <div class="field">
+        <label for="dob">Date of birth</label>
+        <input type="date" name="dob" id="dob" data-name="dob" required>
+        <span class="error">Select valid date</span>
+      </div>
+      <div class="action">
+        <button type="button">Create user</button>
+      </div>
+    </div>
+  `
+}
+
+PeopleContainer.prototype.validateInputs = () => {
+  const url = "/api/v1/auth/signup"
+  const button = this.shadowObj.querySelector('.add > .action > button')
   
-  fetchPeople(){
-    const url = "/api/v1/admin/people"
-    const contentContainer = this.shadowObj.querySelector('#content-container')
+  button.addEventListener('click', e => {
+    e.preventDefault()
+    const inputs = this.shadowObj.querySelectorAll('.add > .field > input')
+    let isValid = true
+    const data = {
+      "roles" : ["user"]
+    }
     
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then(response => {
-        if (!response){
-          console.log('Network error')
-        }
+    inputs.forEach(input => {
+      if (input.value.length < 5 ) {
+        isValid = false
+        let span = input.parentElement.querySelector('span.error')
+        span.style.display = 'flex'
         
-        response.json()
-          .then(data => {
-            if(data.success){
-              // console.log(data)
-              contentContainer.innerHTML = this.getPeople(data.users);
-            }
-            else {
-              console.log('error')
-            }
-          })
-      })
+        setTimeout(() => {
+          span.style.dsiplay = 'none'
+        }, 2000)
+      }
+      else {
+        data[`${input.dataset.name}`] = input.value
+      }
+    })
+    if(isValid){
+      this.signUpRequest(url, data)
+    }
     
-  }
+  })
+}
+
+PeopleContainer.prototype.fetchPeople = () => {
+  const url = "/api/v1/admin/people"
+  const contentContainer = this.shadowObj.querySelector('#content-container')
   
-  validateInputs(){
-    const url = "/api/v1/auth/signup"
-    const button = this.shadowObj.querySelector('.add > .action > button')
-    
-    button.addEventListener('click', e => {
-      e.preventDefault()
-      const inputs = this.shadowObj.querySelectorAll('.add > .field > input')
-      let isValid = true
-      const data = {
-        "roles" : ["user"]
+  fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => {
+      if (!response){
+        console.log('Network error')
       }
       
-      inputs.forEach(input => {
-        if (input.value.length < 5 ) {
-          isValid = false
-          let span = input.parentElement.querySelector('span.error')
-          span.style.display = 'flex'
-          
-          setTimeout(() => {
-            span.style.dsiplay = 'none'
-          }, 2000)
-        }
-        else {
-          data[`${input.dataset.name}`] = input.value
-        }
-      })
-      if(isValid){
-        this.signUpRequest(url, data)
-      }
-      
-    })
-  }
-  
-  signUpRequest(url, data){
-    console.log(data)
-    
-    const { username, name, email, phone, password, roles } = data
-    
-    const dob = this.currentTimestamp(data['dob'])
-    
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username, name, email, phone, dob, password, roles
-      })
-    })
-      .then(response => {
-        if (!response){
-          console.log('Network error')
-        }
-        
-        response.json()
-          .then(data => {
-            if(data.success){
-              // console.log(data)
-              // contentContainer.innerHTML = this.getPeople(data.users);
-              this.fetchPeople()
-            }
-            else {
-              console.log('error')
-            }
-          })
-      })
-  }
-  
-  currentTimestamp = (input) => {
-    const date = new Date(input);
-    
-    let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    let day = String(date.getDate()).padStart(2, '0');
-    let hour = String(date.getHours()).padStart(2, '0');
-    let minute = String(date.getMinutes()).padStart(2, '0');
-    let second = String(date.getSeconds()).padStart(2, '0');
-    
-    return `${date.getFullYear()}${month}${day}${hour}${minute}${second}`;
-  };
-  
-  switchTabs() {
-    const tabs = this.shadowObj.querySelectorAll('.header > span.option')
-    let activeTab = this.shadowObj.querySelector('.header > span.option.active')
-    const contentContainer = this.shadowObj.querySelector('#content-container')
-    if (tabs && contentContainer) {
-      tabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-          e.preventDefault()
-          e.stopPropagation()
-          
-          activeTab.classList.remove('active')
-          tab.classList.add('active')
-          activeTab = tab
-          
-          contentContainer.innerHTML = this.getLoader()
-          
-          switch (tab.dataset.name) {
-            case 'people':
-              this.fetchPeople()
-              break;
-            case 'add':
-              contentContainer.innerHTML = this.addPerson()
-              this.validateInputs()
-              break;
-            default:
-              this.fetchPeople()
-              break;
+      response.json()
+        .then(data => {
+          if(data.success){
+            // console.log(data)
+            contentContainer.innerHTML = this.getPeople(data.users);
+          }
+          else {
+            console.log('error')
           }
         })
-      });
-    }
-  }
+    })
   
-  getTemplate() {
-    // Show HTML Here
-    return `
-      ${this.getBody()}
-      ${this.getStyles()}
-    `
-  }
-  
-  getBody() {
-    return `
+}
+
+PeopleContainer.prototype.getBody = () => {
+  return `
       ${this.getHeader()}
-        
+      
       <div id="content-container" class="content">
         ${this.getLoader()}
       </div>
      
     `
-  }
-  
-  getLoader(){
-    return `
-      <div class="loader"></div>
-    `
-  }
-  
-  getHeader() {
-    return `
+}
+
+PeopleContainer.prototype.getLoader = () => {
+  return `
+    <div class="loader"></div>
+  `
+}
+
+PeopleContainer.prototype.getHeader = () => {
+  return `
       <div class="header">
         <span class="option active" data-name="people">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -210,12 +160,12 @@ export default class PeopleContainer extends HTMLElement {
         </span>
       </div>
     `
-  }
-  
-  getPeople(people) {
-    let html = ''
-    people.forEach((person, index) => {
-      html += `<div class="person" data-id="${index}">
+}
+
+PeopleContainer.prototype.getPeople = people => {
+  let html = ''
+  people.forEach((person, index) => {
+    html += `<div class="person" data-id="${index}">
         <div class="head">
           <div class="profile">
             <img src="${ person.profile_picture }" alt="Profile">
@@ -244,413 +194,92 @@ export default class PeopleContainer extends HTMLElement {
           </a>
         </div>
       </div>`
-    })
-    
-    return html
-  }
+  })
   
-  addPerson() {
-    return `
-      <div class="add">
-        <div class="field">
-          <label for="name">Name</label>
-          <input type="text" name="name" id="name" data-name="name" required>
-          <span class="error">Name is required</span>
-        </div>
-        <div class="field">
-          <label for="username">Username</label>
-          <input type="text" name="username" id="username" data-name="username" required>
-          <span class="error">At least 5 characters</span>
-        </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <input type="password" name="password" id="password" data-name="password" required>
-          <span class="error">Password is required</span>
-        </div>
-        <div class="field">
-          <label for="email">Email</label>
-          <input type="email" name="email" id="email" data-name="email" required>
-          <span class="error">Email is required</span>
-        </div>
-        <div class="field">
-          <label for="number">Phone</label>
-          <input type="tel" name="number" id="number" data-name="phone" required>
-          <span class="error">Input valid phone</span>
-        </div>
-        <div class="field">
-          <label for="dob">Date of birth</label>
-          <input type="date" name="dob" id="dob" data-name="dob" required>
-          <span class="error">Select valid date</span>
-        </div>
-        <div class="action">
-          <button type="button">Create user</button>
-        </div>
-      </div>
-    `
-  }
-  
-  getStyles() {
-    return `
-    <style>
-      * {
-        box-sizing: border-box !important;
-      }
+  return html
+}
 
-      :host {
-        /* border: 1px solid #808080; */
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        display: flex;
-        flex-flow: column;
-        /* align-items: center; */
-        justify-content: center;
-        gap: 10px;
-      }
-      
-      .loader {
-        width: 28px;
-        aspect-ratio: 1;
-        border-radius: 50%;
-        background: #E3AAD6;
-        transform-origin: top;
-        display: grid;
-        animation: l3-0 1s infinite linear;
-      }
-      .loader::before,
-      .loader::after {
-        content: "";
-        grid-area: 1/1;
-        background:#F4DD51;
-        border-radius: 50%;
-        transform-origin: top;
-        animation: inherit;
-        animation-name: l3-1;
-      }
-      .loader::after {
-        background: #F10C49;
-        --s: 180deg;
-      }
-      @keyframes l3-0 {
-        0%,20% {transform: rotate(0)}
-        100%   {transform: rotate(360deg)}
-      }
-      @keyframes l3-1 {
-        50% {transform: rotate(var(--s,90deg))}
-        100% {transform: rotate(0)}
-      }
+PeopleContainer.prototype.signUpRequest = (url, data) => {
+	// console.log(data)
+	
+	const { username, name, email, phone, password, roles } = data
+	
+	const dob = this.currentTimestamp(data['dob'])
+	
+	fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({
+			username, name, email, phone, dob, password, roles
+		})
+	})
+		.then(response => {
+			if (!response){
+				console.log('Network error')
+			}
+			
+			response.json()
+				.then(data => {
+					if(data.success){
+						// console.log(data)
+						// contentContainer.innerHTML = this.getPeople(data.users);
+						this.fetchPeople()
+					}
+					else {
+						console.log('error')
+					}
+				})
+		})
+}
 
-      .header {
-        border-bottom: 1px solid #80808017;
-        background-color: #ffffff;
-        z-index: 5;
-        margin: 0;
-        padding: 30px 0 12px 0;
-        width: 100%;
-        display: flex;
-        flex-flow: row;
-        align-items: center;
-        justify-content: start;
-        gap: 20px;
-        position: sticky;
-        top: 80px;
-      }
+PeopleContainer.prototype.currentTimestamp = (input) => {
+	const date = new Date(input);
+	
+	let month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+	let day = String(date.getDate()).padStart(2, '0');
+	let hour = String(date.getHours()).padStart(2, '0');
+	let minute = String(date.getMinutes()).padStart(2, '0');
+	let second = String(date.getSeconds()).padStart(2, '0');
+	
+	return `${date.getFullYear()}${month}${day}${hour}${minute}${second}`;
+};
 
-      .header > span.option {
-        /* border: 1px solid #80808017; */
-        /* background-color: rgba(20,167,62,1); */
-        padding: 5px 20px 6px 15px;
-        border-radius: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        color: #808080;
-        cursor: pointer;
-      }
+PeopleContainer.prototype.switchTabs = () => {
+	const tabs = this.shadowObj.querySelectorAll('.header > span.option')
+	let activeTab = this.shadowObj.querySelector('.header > span.option.active')
+	const contentContainer = this.shadowObj.querySelector('#content-container')
+	if (tabs && contentContainer) {
+		tabs.forEach(tab => {
+			tab.addEventListener('click', (e) => {
+				e.preventDefault()
+				e.stopPropagation()
+				
+				activeTab.classList.remove('active')
+				tab.classList.add('active')
+				activeTab = tab
+				
+				contentContainer.innerHTML = this.getLoader()
+				
+				switch (tab.dataset.name) {
+					case 'people':
+						this.fetchPeople()
+						break;
+					case 'add':
+						contentContainer.innerHTML = this.addPerson()
+						this.validateInputs()
+						break;
+					default:
+						this.fetchPeople()
+						break;
+				}
+			})
+		});
+	}
+}
 
-      .header > span.option.active {
-        background-color: #f5f5f5;
-        color: #404040;
-        font-weight: 500;
-      }
-
-      .header > span.option:hover {
-        color: #404040;
-        font-weight: 500;
-      }
-
-      .header > span.option svg {
-        /* border: 1px solid #80808017; */
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .header > span.option svg path {
-        fill: #808080;
-      }
-
-      .header > span.option:hover svg path {
-        fill: #404040;
-      }
-
-      .header > span.option.active svg path {
-        fill: #404040;
-      }
-
-      .header > span.option span {
-        font-family: var(--font-alt),sans-serif;
-        font-weight: inherit;
-      }
-
-      .content {
-        margin: 0;
-        padding: 20px 0;
-        width: 100%;
-        display: flex;
-        flex-flow: row;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        min-height: 80vh;
-        gap: 30px;
-      }
-
-      .content > .person {
-        border: 1px solid #80808017;
-        margin: 0;
-        padding: 15px;
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
-        border-radius: 15px;
-        background-position-x: 0;
-        background-position-y: 0;
-        background-repeat: repeat;
-        background-image: none;
-        box-shadow: 8px 8px 30px 0 rgba(42, 67, 113, 0.034);
-      }
-
-      .content > .person > .head {
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0;
-      }
-
-      .content > .person > .head > .profile {
-        /* border: 1px solid #808080; */
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        width: 100px;
-        height: 100px;
-        gap: 0;
-        border-radius: 50px;
-      }
-
-      .content > .person > .head > .profile > img {
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 100%;
-        gap: 0;
-        border-radius: 50px;
-        object-fit: cover;
-      }
-
-      .content > .person > .head > .info {
-        /* border: 1px solid #808080; */
-        padding: 8px 0 18px 0;
-        display: flex;
-        flex-flow: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0;
-      }
-
-      .content > .person > .head > .info > h4 {
-        margin: 0;
-        font-family: var(--font-alt),sans-serif;
-        font-weight: 500;
-        color: #404040;
-        font-size: 1.1rem;
-      }
-
-      .content > .person > .head > .info > span.role {
-        margin: 0;
-        font-family: var(--font-alt),sans-serif;
-        font-weight: 400;
-        color: #808080;
-        font-size: 0.85rem;
-      }
-
-      .content > .person > .socials {
-        /* border: 1px solid #808080; */
-        display: flex;
-        flex-flow: row;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-      }
-
-      .content > .person > .socials > a {
-        /* border: 1px solid #808080; */
-        background-color: #f5f5f5;
-        padding: 5px 10px;
-        display: flex;
-        flex-flow: row;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        color: #808080;
-        border-radius: 50px;
-
-      }
-
-      .content > .person > .socials > a:hover svg path { 
-        fill: #08b86f;
-      }
-
-      .content > .person > .socials > a svg {
-        width: 20px;
-        height: 20px;
-      }
-
-      .content > .person > .socials > a svg path {
-        fill: #808080;
-      }
-
-      .add {
-        margin: 0 0 20px 0;
-        width: 90%;
-        display: flex;
-        flex-flow: column;
-        justify-content: center;
-        align-items: start;
-        gap: 15px;
-      }
-
-
-      .add > .action {
-        /* border: 1px solid black; */
-        padding: 20px 0 30px 0;
-        width: 80%;
-        display: flex;
-        flex-flow: column;
-        justify-content: center;
-        align-items: center;
-        gap: 2px;
-      }
-
-      .add > .action > button {
-        border: none;
-        outline: none;
-        background-color: rgba(20,167,62,1);
-        padding: 10px 25px;
-        font-family: var(--font-alt),sans-serif;
-        font-weight: 500;
-        font-size: 1rem;
-        color: #ffffff;
-        display: flex;
-        flex-flow: column;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        gap: 2px;
-        border-radius: 25px;
-      }
-
-
-      .add > .field {
-        /*border: 1px solid black;*/
-        width: 80%;
-        display: flex;
-        flex-flow: column;
-        justify-content: center;
-        align-items: start;
-        gap: 2px;
-      }
-
-      .add > .field > span.error {
-        color: #ee7752;
-        font-size: 0.8rem;
-        display: none;
-      }
-
-      .add > .field > label {
-        font-family: var(--font-alt),sans-serif;
-        padding: 5px 2px;
-        color: #404040;
-        font-weight: 400;
-        font-size: 1.1rem;
-      }
-
-      .add > .field > span.wrapper {
-        display: flex;
-        align-items: center;
-        gap: 0;
-        width: 100%;
-      }
-      .add > .field > span.wrapper > span {
-        border: 1px solid #80808037;
-        border-right: none;
-        font-size: 1rem;
-        width: 60px;
-        padding: 10px 12px;
-        border-top-left-radius: 12px;
-        border-bottom-left-radius: 12px;
-        color: #08b86f;
-        display: flex;
-        align-items: center;
-      }
-
-      .add > .field > span.wrapper > input {
-        border: 1px solid #80808037;
-        font-size: 1rem;
-        width: calc(100% - 60px);
-        outline: none;
-        padding: 10px 12px;
-        border-top-right-radius: 12px;
-        border-bottom-right-radius: 12px;
-        color: #404040;
-      }
-
-      .add > .field >  span.wrapper > input:focus {
-        border: 1px solid #08b86f60;
-      }
-
-      .add > .field > input {
-        border: 1px solid #80808037;
-        font-size: 1rem;
-        width: 100%;
-        outline: none;
-        padding: 10px 12px;
-        border-radius: 12px;
-        color: #404040;
-      }
-      
-      .add > .field > span.error {
-        color: #ee7752;
-        font-size: 0.8rem;
-        display: none;
-      }
-
-      .add > .field > input:focus {
-        border: 1px solid #08b86f60;
-      }
-    
-      
-    </style>
-    `
-  }
+//Exporting the components
+module.exports = {
+	PeopleContainer: PeopleContainer
 }
