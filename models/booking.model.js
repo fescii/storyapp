@@ -40,9 +40,9 @@ module.exports = (sequelize, Sequelize) => {
 			allowNull: false,
 		},
 		photographers:{
-			type: Sequelize.ARRAY(Sequelize.INTEGER),
-			allowNull: false,
-			defaultValue: []
+			type: Sequelize.ARRAY(Sequelize.STRING),
+			allowNull: true,
+			// defaultValue: []
 		},
 		status: {
 			type: Sequelize.ENUM('started', 'completed', 'not-started', 'cancelled'),
@@ -99,9 +99,9 @@ module.exports = (sequelize, Sequelize) => {
 			allowNull: false,
 		},
 		photographers:{
-			type: Sequelize.ARRAY(Sequelize.INTEGER),
-			allowNull: false,
-			defaultValue: []
+			type: Sequelize.ARRAY(Sequelize.STRING),
+			allowNull: true,
+			// defaultValue: []
 		},
 		solid: {
 			type: Sequelize.BOOLEAN,

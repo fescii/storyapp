@@ -4,7 +4,7 @@ export default class ScheduleModal extends HTMLElement {
     // We are not even going to touch this.
     super();
 
-    // lets create our shadow root
+    // let's create our shadow root
     this.shadowObj = this.attachShadow({ mode: 'open' });
 
     this.render();
@@ -18,7 +18,7 @@ export default class ScheduleModal extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log('We are inside connectedCallback');
+    // console.log('We are inside connectedCallback');
     
     this.disableScroll()
 
@@ -38,8 +38,8 @@ export default class ScheduleModal extends HTMLElement {
         this.remove()
       })
     }
-
-    this.activateContent()
+    
+    this.getOptions()
 
   }
 
@@ -103,8 +103,7 @@ export default class ScheduleModal extends HTMLElement {
       ${this.getStyles()}
     `
   }
-
-
+  
   getHeader(){
     return `
       <div class="content-head">
@@ -121,6 +120,12 @@ export default class ScheduleModal extends HTMLElement {
       </div>
     `
   }
+  
+  getLoader(){
+    return `
+      <div class="loader"></div>
+    `
+  }
 
   getContent() {
     return `
@@ -133,14 +138,12 @@ export default class ScheduleModal extends HTMLElement {
       </div>
       <div class="services">
         <div class="options">
-          ${this.getOptions(this.getAttribute('edit'))}
+          ${this.getLoader()}
         </div>
       </div>
     `
   }
   
- 
-
   getInput(edit){
     if (edit === 'true') {
       return `
@@ -153,30 +156,125 @@ export default class ScheduleModal extends HTMLElement {
       `
     }
   }
-
-  getOptions = (edit) => {
-    let html = ''
-    if (edit === 'true') {
-      const photographers = this.getAttribute('photographers').split(',')
-      console.log(photographers)
-
-      photographers.forEach(item => {
-        html += `
-          <span class="option selected" data-value="event">
-            <span class="text">${item}</span>
-          </span>
-        `
+  
+  getOptions = () => {
+    let html = '',
+      edit = this.getAttribute('edit');
+    const content = this.shadowObj.querySelector('section#content > .container > .services > .options')
+    let photographers = this.getAttribute('photographers').split(',') || []
+    const url = '/api/v1/admin/people';
+    
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        if (!response){
+          console.log('Network error')
+        }
+        response.json()
+          .then(data => {
+            if(data.success){
+              // console.log(data)
+              if (edit === 'true') {
+                data.users.forEach(user => {
+                  // photographers.push(user.username)
+                  
+                  if (photographers.includes(user.username)) {
+                    html += `
+                        <span class="option selected" data-value="${user.username}">
+                          <span class="text">${user.username}</span>
+                        </span>
+                      `
+                  } else {
+                    html += `
+                        <span class="option" data-value="${user.username}">
+                          <span class="text">${user.username}</span>
+                        </span>
+                      `
+                  }
+                  content.innerHTML = html
+                })
+              }
+              else {
+                data.users.forEach(user => {
+                  // photographers.push(user.username)
+                  html += `
+                    <span class="option" data-value="${user.username}">
+                      <span class="text">${user.username}</span>
+                    </span>
+                  `
+                  content.innerHTML = html
+                })
+              }
+              this.activateContent()
+              this.updateSchedules()
+            }
+            else {
+              console.log('No data available')
+            }
+           
+          })
       })
-
-      return html
-    } 
-    else {
-      console.log('No data available')
-    }
-
-    return html
   }
-
+  
+  updateSchedules(){
+    const button = this.shadowObj.querySelector('section#content > .footer > .action')
+    button.addEventListener('click', (e) => {
+      e.preventDefault()
+      let photographers = []
+      
+      const selected = this.shadowObj.querySelectorAll('section#content > .container > .services > .options > .option.selected')
+      const dateValue = this.shadowObj.querySelector('section#content > .container > .fields > .field > input').value
+      
+      selected.forEach(user => {
+        photographers.push(user.dataset.value)
+      })
+      
+      const outerThis = this
+      
+      this.sendRequest(photographers, dateValue).then(r => {
+        outerThis.remove()
+      })
+    })
+  }
+  
+  async sendRequest(photographers, dateValue) {
+    const url = '/api/v1/schedule/make';
+    const solid = false
+    const date = this.timeStamp(dateValue);
+    const options = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({solid, date, photographers})
+    };
+    
+    try {
+      const response = await fetch(url, options);
+      const data = await response.json();
+      // console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  
+  timeStamp(inputDate) {
+    // Parse the input date string
+    const date = new Date(inputDate);
+    
+    // Extract year, month, day, hours, minutes, and seconds
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed, so add 1
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    
+    // Format the date in the custom format
+    return `${year}${month}${day}${hours}${minutes}${seconds}`;
+  }
 
   getTop(edit){
     if (edit === 'true') {
@@ -201,9 +299,8 @@ export default class ScheduleModal extends HTMLElement {
     }
   }
 
-
   getStyles() {
-    console.log('No data available')
+    // console.log('No data available')
     return `
     <style>
       * {
@@ -227,6 +324,41 @@ export default class ScheduleModal extends HTMLElement {
         left: 0;
         backdrop-filter: blur(3px);
         -webkit-backdrop-filter: blur(3px);
+      }
+      
+      .loader {
+        width: 28px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #E3AAD6;
+        transform-origin: top;
+        display: grid;
+        animation: l3-0 1s infinite linear;
+       }
+      .loader::before,
+      .loader::after {
+        content: "";
+        grid-area: 1/1;
+        background:#F4DD51;
+        border-radius: 50%;
+        transform-origin: top;
+        animation: inherit;
+        animation-name: l3-1;
+      }
+      
+      .loader::after {
+        background: #F10C49;
+        --s: 180deg;
+      }
+      
+      @keyframes l3-0 {
+        0%,20% {transform: rotate(0)}
+        100%   {transform: rotate(360deg)}
+      }
+      
+      @keyframes l3-1 {
+        50% {transform: rotate(var(--s,90deg))}
+        100% {transform: rotate(0)}
       }
 
       div.overlay {
@@ -532,7 +664,7 @@ export default class ScheduleModal extends HTMLElement {
       section#content > .container > .services > .other{
         /*border-top: 1px solid #80808017;*/
         width: 100%;
-        padding: 15px 0px;
+        padding: 15px 0;
         display: flex;
         flex-flow: column;
         justify-content: center;

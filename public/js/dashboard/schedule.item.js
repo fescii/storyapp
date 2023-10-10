@@ -4,7 +4,7 @@ export default class ScheduleItem extends HTMLElement {
     // We are not even going to touch this.
     super();
 
-    // lets create our shadow root
+    // let's create our shadow root
     this.shadowObj = this.attachShadow({ mode: 'open' });
 
     this.render();
@@ -21,8 +21,22 @@ export default class ScheduleItem extends HTMLElement {
 
     this.editSchedule()
   }
-
-
+  
+  switchTabs() {
+    const tab = this.shadowObj.querySelector('.header > .right')
+    const contentContainer = this.shadowObj.querySelector('#content-container')
+    if (tab && contentContainer) {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        
+        contentContainer.innerHTML = this.addPerson()
+      
+      })
+    }
+  }
+  
+  
   editSchedule(){
     const modalContainer = document.querySelector('body > section#modal')
     const button = this.shadowObj.querySelector('.options > .option.edit')
@@ -42,8 +56,7 @@ export default class ScheduleItem extends HTMLElement {
       })
     }
   }
-
-
+  
   getTemplate() {
     // Show HTML Here
     return `
@@ -109,16 +122,16 @@ export default class ScheduleItem extends HTMLElement {
         align-items: center;
         justify-content: start;
         gap: 20px;
-        background-position-x: 0%;
-        background-position-y: 0%;
+        background-position-x: 0;
+        background-position-y: 0;
         background-repeat: repeat;
         background-image: none;
-        box-shadow: 8px 8px 30px 0px rgba(42, 67, 113, 0.034);
+        box-shadow: 8px 8px 30px 0 rgba(42, 67, 113, 0.034);
         border-radius: 15px;
       }
 
       * {
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         color: #404040;
         text-align: center;
       }

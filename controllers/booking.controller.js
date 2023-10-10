@@ -3,7 +3,7 @@ const { timeUtil, arrayUtil} = require('../utils')
 const { Booking, Transaction, Schedule, User, sequelize } = db
 const Op = db.Sequelize.Op;
 
-// Booking ..
+// Booking ...
 makeOrder = (req, res) => {
 	return Booking.create({
 		orderId: req.body.orderId,

@@ -1,49 +1,49 @@
 export default class ScheduleContainer extends HTMLElement {
   constructor() {
-
+    
     // We are not even going to touch this.
     super();
-
-    // lets create our shadow root
+    
+    // let's create our shadow root
     this.shadowObj = this.attachShadow({ mode: 'open' });
-
+    
     this.render();
   }
-
-
+  
+  
   render() {
     this.shadowObj.innerHTML = this.getTemplate();
     // this.innerHTML = this.getTemplate();
   }
-
+  
   connectedCallback() {
     // console.log('We are inside connectedCallback');
-
+    
     this.openCreate()
+    this.fetchSchedules()
   }
-
+  
   openCreate(){
     const modalContainer = document.querySelector('body > section#modal')
     const button = this.shadowObj.querySelector('.header > .right')
-
+    
     // const element = document.createElement('modal-schedule')
-
+    
     const modal = `
-      <modal-schedule url="some-url" edit="false" date="${button.dataset.dat}">
+      <modal-schedule url="some-url" photographers="" edit="false" date="${button.dataset.date}">
       </modal-schedule>
     `
-
+    
     if (modalContainer && button) {
       button.addEventListener('click', (e) => {
         e.preventDefault()
         e.stopPropagation()
-
+        
         modalContainer.innerHTML = modal
       })
     }
   }
-
-
+  
   getTemplate() {
     // Show HTML Here
     return `
@@ -51,18 +51,45 @@ export default class ScheduleContainer extends HTMLElement {
       ${this.getStyles()}
     `
   }
-
+  
   getBody() {
     return `
       ${this.getHeader()}
-        
+
       <div id="content-container" class="content">
-        ${this.getSchedules()}
+        ${this.getLoader()}
       </div>
-     
     `
   }
-
+  
+  fetchSchedules(){
+    const url = '/api/v1/admin/schedules';
+    const contentContainer = this.shadowObj.querySelector('#content-container')
+    
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        if (!response){
+          console.log('Network error')
+        }
+        
+        response.json()
+          .then(data => {
+            if(data.success){
+              // console.log(data)
+              contentContainer.innerHTML = this.getSchedules(data.schedules);
+            }
+            else {
+              console.log('error')
+            }
+          })
+      })
+  }
+  
   getHeader() {
     return `
       <div class="header">
@@ -78,48 +105,51 @@ export default class ScheduleContainer extends HTMLElement {
       </div>
     `
   }
-
-  getSchedules(){
+  
+  getLoader(){
     return `
-      <schedule-item date-en="12 Sep, 2023" date="2023-10-01"
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01"
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01" 
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01"
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01" 
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01" 
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01" 
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01"
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
-      <schedule-item date-en="12 Sep, 2023"  date="2023-10-01" 
-        photographers="mathias,malcolm,femar" photographers-no="3"
-      >
-      </schedule-item>
+      <div class="loader"></div>
     `
   }
-
+  
+  getSchedules(schedules, users){
+    let html = ''
+    schedules.forEach((schedule, index) => {
+      html += `
+        <schedule-item date-en="${this.enDate(schedule.date)}"  date="${this.formatDate(schedule.date)}"
+          photographers="${this.arrayToString(schedule.photographers)}" photographers-no="${schedule.photographers.length}">
+        </schedule-item>
+      `
+    })
+    
+    return html
+  }
+  
+  arrayToString(arr) {
+    if (!Array.isArray(arr)) {
+      throw new Error("Input is not an array");
+    }
+    
+    return arr.join(",");
+  }
+  
+	formatDate(inputDate) {
+		const date = new Date(inputDate);
+		
+		const year = date.getFullYear();
+		const month = (date.getMonth() + 1).toString().padStart(2, '0');
+		const day = (date.getDate()).toString().padStart(2, '0');
+		
+		return `${year}-${month}-${day}`;
+	}
+  
+  enDate(inputDate) {
+    const date = new Date(inputDate);
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    
+    return date.toLocaleDateString('en-US', options);
+  }
+  
   getStyles() {
     return `
     <style>
@@ -138,6 +168,41 @@ export default class ScheduleContainer extends HTMLElement {
         justify-content: center;
         gap: 10px;
       }
+      
+      .loader {
+        width: 28px;
+        aspect-ratio: 1;
+        border-radius: 50%;
+        background: #E3AAD6;
+        transform-origin: top;
+        display: grid;
+        animation: l3-0 1s infinite linear;
+       }
+      .loader::before,
+      .loader::after {
+        content: "";
+        grid-area: 1/1;
+        background:#F4DD51;
+        border-radius: 50%;
+        transform-origin: top;
+        animation: inherit;
+        animation-name: l3-1;
+      }
+      
+      .loader::after {
+        background: #F10C49;
+        --s: 180deg;
+      }
+      
+      @keyframes l3-0 {
+        0%,20% {transform: rotate(0)}
+        100%   {transform: rotate(360deg)}
+      }
+      
+      @keyframes l3-1 {
+        50% {transform: rotate(var(--s,90deg))}
+        100% {transform: rotate(0)}
+      }
 
       .header {
         border-bottom: 1px solid #80808017;
@@ -154,9 +219,8 @@ export default class ScheduleContainer extends HTMLElement {
       .header > .left > p {
         margin: 0;
         padding: 0;
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         color: #404040;
-        font-family: 500;
         font-size: 1.2rem;
       }
 
@@ -183,20 +247,21 @@ export default class ScheduleContainer extends HTMLElement {
       }
 
       .header > .right span {
-        font-family: var(--font-alt);
+        font-family: var(--font-alt),sans-serif;
         font-weight: 500;
       }
 
       .content {
-        /* border: 1px solid #808080; */
+        /*border: 1px solid #808080;*/
         margin: 0;
         padding: 20px 0;
+        min-height: 70vh;
         width: 100%;
         display: flex;
         flex-flow: row;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: start;
+        justify-content: center;
         gap: 30px;
       }
 
@@ -208,53 +273,14 @@ export default class ScheduleContainer extends HTMLElement {
         display: flex;
         flex-flow: column;
         align-items: center;
-        justify-content: start;
+        justify-content: center;
         gap: 20px;
-        background-position-x: 0%;
-        background-position-y: 0%;
+        background-position-x: 0;
+        background-position-y: 0;
         background-repeat: repeat;
         background-image: none;
-        box-shadow: 8px 8px 30px 0px rgba(42, 67, 113, 0.034);
+        box-shadow: 8px 8px 30px 0 rgba(42, 67, 113, 0.034);
         border-radius: 15px;
-      }
-
-      .content > .day * {
-        font-family: var(--font-alt);
-        color: #404040;
-        text-align: center;
-      }
-      .content > .day .date {
-        /* border: 1px solid #808080; */
-        color: #808080;
-        font-size: 0.95rem;
-      }
-
-      .content > .day .options {
-        display: flex;
-        gap: 30px;
-      }
-
-      .content > .day .options >.option {
-        background-color: #f5f5f5;
-        color: #666666;
-        padding: 5px 15px 5px 10px;
-        display: flex;
-        flex-flow: row;
-        align-items: center;
-        justify-content: center;
-        gap: 5px;
-        font-size: 0.9rem;
-        border-radius: 50px;
-        cursor: pointer;
-      }
-
-      .content > .day .options > .option svg {
-        width: 20px;
-        height: 20px;
-      }
-
-      .content > .day .options > .option svg path {
-        fill: #666666;
       }
       
     </style>

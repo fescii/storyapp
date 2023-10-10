@@ -34,6 +34,13 @@ module.exports = function(app) {
 		adminController.fetchBookings
 	)
 	
+	//Get schedules
+	app.get(
+		"/api/v1/admin/schedules",
+		[authJwt.verifyToken, authJwt.isAdmin],
+		adminController.fetchSchedules
+	)
+	
 	//Get people
 	app.get(
 		"/api/v1/admin/people",

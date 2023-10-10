@@ -1,5 +1,5 @@
 const db = require('../models')
-const { Booking, User, sequelize } = db
+const { Booking, User, Schedule, sequelize } = db
 const Op = db.Sequelize.Op
 const { timeUtil } = require('../utils')
 
@@ -219,7 +219,9 @@ dashboardHeader = async (req, res) => {
 }
 
 fetchPeople = (req, res) => {
-	User.findAll()
+	User.findAll({
+			attributes: ['username',]
+		})
 		.then(users => {
 			if(!users){
 				return res.status(200).json({
@@ -243,9 +245,43 @@ fetchPeople = (req, res) => {
 		})
 }
 
+fetchSchedules = async (req, res) => {
+	const date = new Date(Date.now())
+	
+	Schedule.findAll({
+		where: {
+			date: {
+				[Op.gte]: date
+			}
+		},
+		order: [['date', 'ASC']]
+		})
+		.then(schedules => {
+			if(!schedules){
+				return res.status(200).json({
+					success: false,
+					message: 'No Schedules found.'
+				})
+			}
+			
+			return res.status(200).json({
+				success: true,
+				schedules
+			})
+			
+		})
+		.catch(err => {
+			console.log(err)
+			return res.status(500).json({
+				success: false,
+				message: 'An error has occurred!'
+			})
+		})
+}
+
 const adminController = {
 	updateStatus, fetchBookings, getStats,
-	dashboardHeader, fetchPeople
+	dashboardHeader, fetchPeople, fetchSchedules
 }
 
 module.exports = adminController
