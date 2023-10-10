@@ -215,7 +215,6 @@ export default class StatContainer extends HTMLElement {
     `
   }
   
-  
   getStyles() {
     return `
     <style>

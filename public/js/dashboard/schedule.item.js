@@ -51,7 +51,6 @@ export default class ScheduleItem extends HTMLElement {
         e.preventDefault()
         e.stopPropagation()
 
-        // body.insertAdjacentElement('beforeend', element)
         modalContainer.innerHTML = modal
       })
     }

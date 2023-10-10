@@ -52,6 +52,9 @@ fetchBookings = async (req, res) => {
 			filter = {
 				date: {
 					[Op.gte]: dateObj
+				},
+				status:{
+					[Op.not]: 'cancelled'
 				}
 			}
 			totalBookings = await Booking.count({

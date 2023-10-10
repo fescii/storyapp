@@ -28,7 +28,7 @@ module.exports = function(app) {
 	)
 	
 	//Get bookings
-	app.get(
+	app.post(
 		"/api/v1/admin/bookings",
 		[authJwt.verifyToken, authJwt.isAdmin],
 		adminController.fetchBookings

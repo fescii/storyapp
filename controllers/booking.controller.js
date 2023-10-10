@@ -137,11 +137,11 @@ checkAvailability = (req, res) => {
 		.then(schedule => {
 			if (schedule) {
 				// If there is a schedule for the specified day, get the photographers
-				const photographerIdsInSchedule = schedule.photographers;
+				const photographersInSchedule = schedule.photographers;
 				return User.findAll({
 					where: {
 						id: {
-							[Op.notIn]: photographerIdsInSchedule,
+							[Op.notIn]: photographersInSchedule,
 						},
 						available: true, // Filter by the 'available' field with a value of true
 					},

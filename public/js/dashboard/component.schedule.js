@@ -112,7 +112,7 @@ export default class ScheduleContainer extends HTMLElement {
     `
   }
   
-  getSchedules(schedules, users){
+  getSchedules(schedules){
     let html = ''
     schedules.forEach((schedule, index) => {
       html += `

@@ -177,14 +177,14 @@ export default class bookingItem extends HTMLElement {
         return 'Not started'
       case 'started':
         return 'Started'
-      case 'finished':
+      case 'completed':
         return 'Finished'
       case 'pending':
         return 'Pending'
       case 'cancelled':
         return 'Cancelled'
       default:
-        return 'Not started'
+        return
     }
   }
 
@@ -248,7 +248,7 @@ export default class bookingItem extends HTMLElement {
         background-color: #ffcc004c;
       }
 
-      .head > .left > .date.finished {
+      .head > .left > .date.completed {
         background-color: #099eef18;
       }
 
@@ -260,7 +260,6 @@ export default class bookingItem extends HTMLElement {
         line-height: 1;
       }
       
-
       .head > .left > .date >  span.no {
         margin: 0;
         display: inline-block;
@@ -311,7 +310,6 @@ export default class bookingItem extends HTMLElement {
         font-size: 1rem;
       }
 
-
       .head > .left .quick-info > .top .service {
         /* color: #08b86f; */
         color: #606060;
@@ -325,7 +323,7 @@ export default class bookingItem extends HTMLElement {
         font-family: inherit;
       }
 
-      .head > .left .quick-info > .top .status.finished {
+      .head > .left .quick-info > .top .status.completed {
         color: #08b86f;
       }
 

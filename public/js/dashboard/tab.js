@@ -12,14 +12,14 @@ if (tabs && contentContainer && activeTab) {
       tab.classList.add('active')
       activeTab = tab
 
-      populateContent(contentContainer, tab.dataset.name)
+      populateContent(contentContainer, tab)
     })
   })
 }
 
 
 const populateContent = (contentContainer, tab) => {
-  switch (tab) {
+  switch (tab.dataset.name) {
     case 'overview':
       contentContainer.innerHTML = `
         <stat-container bookings="163" date="Sep 23" completed="57" upcoming="33" cancelled="8" visitors="1,400"
@@ -41,7 +41,7 @@ const populateContent = (contentContainer, tab) => {
       break;
     case 'bookings':
       contentContainer.innerHTML = `
-        <booking-container url="some-link" >
+        <booking-container status="${tab.dataset.status}" >
         </booking-container>
       `
       break;
