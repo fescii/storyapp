@@ -115,7 +115,8 @@ fetchBookings = async (req, res) => {
 	Booking.findAll({
 		limit,
 		offset,
-		where : filter
+		where : filter,
+		order: [['date', 'ASC']]
 	})
 	.then(bookings => {
 		if(!bookings){

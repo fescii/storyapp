@@ -2,45 +2,102 @@ export default class BookingContainer extends HTMLElement {
   constructor() {
     // We are not even going to touch this.
     super();
-
+    
     // let's create our shadow root
     this.shadowObj = this.attachShadow({ mode: "open" });
-
+    
     this.render();
   }
-
+  
   render() {
     this.shadowObj.innerHTML = this.getTemplate();
     // this.innerHTML = this.getTemplate();
   }
-
+  
   connectedCallback() {
     // console.log('We are inside connectedCallback');
-    
-    this.fetchBookings(this.getAttribute('status')).then(() => {
+	  let page = 1
+	  
+    this.fetchBookings(this.getAttribute('status'), page).then(() => {
       console.log('Run!!')
     })
   }
   
-  async fetchBookings(status) {
+  async fetchBookings(status, page) {
     const contentContainer = this.shadowObj.querySelector('#content-container')
-    let page = 1
+	  const body  = `{"date":"${this.currentTimestamp()}","status":"${status}"}`
+    
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: `{"date":"${this.currentTimestamp()}","status":"${status}"}`
+      body: body
     };
     
     try {
       const response = await fetch(`/api/v1/admin/bookings?page=${page}`, options);
       const data = await response.json();
+			console.log(data)
       contentContainer.innerHTML = this.getBookings(data.bookings)
+	    
+	    if (data.pagination.currentPage < data.pagination.totalPages){
+		    contentContainer.insertAdjacentHTML('beforeend', this.getMore())
+				page += 1
+				this.loadMore(page, status, contentContainer)
+	    }
+	    else {
+		    contentContainer.insertAdjacentHTML('beforeend', `<p class="all">That's all</p>`)
+	    }
+	    
     } catch (error) {
       console.error(error);
     }
   }
+	
+	loadMore(page, status, contentContainer){
+		const loadButton = this.shadowObj.querySelector('#load-more')
+		
+		loadButton.addEventListener('click', async e => {
+			e.preventDefault()
+			
+			await this.fetchPage(loadButton, contentContainer, page, status)
+		})
+	}
+	
+	async fetchPage(loadButton, contentContainer, page, status) {
+		loadButton.remove()
+		contentContainer.insertAdjacentHTML('beforeend', this.getLoader())
+		const body  = `{"date":"${this.currentTimestamp()}","status":"${status}"}`
+		
+		const options = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: body
+		};
+		
+		try {
+			const response = await fetch(`/api/v1/admin/bookings?page=${page}`, options);
+			const data = await response.json();
+			const loader = contentContainer.querySelector('div.loader')
+			loader.remove()
+			contentContainer.insertAdjacentHTML('beforeend', this.getBookings(data.bookings))
+			// contentContainer.insertAdjacentHTML('beforeend', this.getMore())
+			
+			if (data.pagination.currentPage < data.pagination.totalPages){
+				page += 1
+				contentContainer.insertAdjacentHTML('beforeend', this.getMore())
+				this.loadMore(page, status, contentContainer)
+			}
+			else {
+				contentContainer.insertAdjacentHTML('beforeend', `<p class="all">That's all</p>`)
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
   
   currentTimestamp = () => {
     const date = new Date();
@@ -53,7 +110,7 @@ export default class BookingContainer extends HTMLElement {
     
     return `${date.getFullYear()}${month}${day}${hour}${minute}${second}`;
   };
-
+  
   getTemplate() {
     // Show HTML Here
     return `
@@ -69,7 +126,7 @@ export default class BookingContainer extends HTMLElement {
       <div class="loader"></div>
     `
   }
-
+  
   getBookings(bookings) {
     let html = ''
     bookings.forEach(booking => {
@@ -90,7 +147,15 @@ export default class BookingContainer extends HTMLElement {
     
     return html
   }
-
+  
+  getMore = () => {
+    return `
+      <span id="load-more" class="load-more">
+        <span class="no">Load more</span>
+      </span>
+    `
+  }
+  
   getStyles() {
     return `
     <style>
@@ -112,6 +177,7 @@ export default class BookingContainer extends HTMLElement {
       
       .content {
         padding: 20px 0 0 0;
+        margin: 0 0 70px 0;
         width: 100%;
         min-height: 70vh;
         display: flex;
@@ -121,7 +187,38 @@ export default class BookingContainer extends HTMLElement {
         gap: 10px;
       }
       
+      p.all {
+      	margin: 20px 0;
+      	text-align: center;
+      	color: #808080;
+      	font-family: var(--font-alt) sans-serif;
+      }
+      
+      span.load-more{
+        color: white;
+        background-color: #08b86f;
+        padding: 7px 12px;
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        justify-content: center;
+        height: max-content;
+        gap: 0;
+        margin-top: 15px;
+        border-radius: 50px;
+      }
+      
+      span.load-more{
+      	cursor: pointer;
+        color: #ffffff;
+      }
+      
+      span.load-more>i{
+        margin-top: 4px;
+      }
+      
       .loader {
+        margin: 50px;
         width: 28px;
         aspect-ratio: 1;
         border-radius: 50%;
