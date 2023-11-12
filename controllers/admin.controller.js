@@ -282,7 +282,7 @@ fetchSchedules = async (req, res) => {
 			})
 		})
 }
-
+// Exports object
 const adminController = {
 	updateStatus, fetchBookings, getStats,
 	dashboardHeader, fetchPeople, fetchSchedules
